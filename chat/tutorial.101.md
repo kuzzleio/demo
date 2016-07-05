@@ -54,7 +54,7 @@ In your html, you can then include it.
 
 ## Connecting to Kuzzle
 
-Connecting to Kuzzle is just a matter of instantiating a [Kuzzle object](http://kuzzleio.github.io/sdk-documentation/#kuzzle).
+Connecting to Kuzzle is just a matter of instantiating a [Kuzzle object](http://kuzzle.io/sdk-documentation/#kuzzle).
 
 We expose it as an [Angular service](https://docs.angularjs.org/guide/services).
 
@@ -131,7 +131,7 @@ It also defines the chat room properties we will need.
 * _messages_: An array containing the messages we get on the chat.
 * _subscribed_: A boolean value that indicates if our chat room object has
 subscribed to Kuzzle.
-* _kuzzleSubscription_: Once the subscription to Kuzzle is established, this attribute is used to store the corresponding [KuzzleRoom](http://kuzzleio.github.io/sdk-documentation/#kuzzleroom) object.
+* _kuzzleSubscription_: Once the subscription to Kuzzle is established, this attribute is used to store the corresponding [KuzzleRoom](http://kuzzle.io/sdk-documentation/#kuzzleroom) object.
 
 :warning: _The vocabulary can be confusing between our application
 chat room and Kuzzle internal rooms on which it relies.
@@ -162,7 +162,7 @@ ChatRoom.prototype.subscribe = function () {
 };
 ```
 
-The `subscribe` method just registers the application to Kuzzle to receive the incoming messages using the [KuzzleDataCollection subscribe method](http://kuzzleio.github.io/sdk-documentation/#subscribe).
+The `subscribe` method just registers the application to Kuzzle to receive the incoming messages using the [KuzzleDataCollection subscribe method](http://kuzzle.io/sdk-documentation/#subscribe).
 
 Kuzzle's `subscribe` method expects to receive three parameters:
 
@@ -196,7 +196,7 @@ ChatRoom.prototype.sendMessage = function (message, me) {
 };
 ```
 
-The sendMessage method is just a wrapper for the [KuzzleDataCollection publish](http://kuzzleio.github.io/sdk-documentation/#publish) method.
+The sendMessage method is just a wrapper for the [KuzzleDataCollection publish](http://kuzzle.io/sdk-documentation/#publishmessage) method.
 
 :bulb: Note the chatRoom property in the submitted object that will match our subscription filter.
 

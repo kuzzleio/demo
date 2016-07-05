@@ -7,6 +7,6 @@
   "license": "MIT",
   "dependencies": {
     "node-uuid": "^1.4.7",
-    "kuzzle-sdk": "1.7.3"
+    "kuzzle-sdk": "1.9.1"
   }
 }

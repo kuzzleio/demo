@@ -10,7 +10,7 @@ var config = {
             users: {
                 pos: {type: 'geo_point'},
                 type: {type: 'string', index: 'analyzed', null_value: 'none'},
-                status: {type: 'string', index: 'analyzed', null_value: 'none'},
+                status: {type: 'string', index: 'analyzed'},
                 sibling: {type: 'string', index: 'analyzed', null_value: 'none'}
             },
             rides: {

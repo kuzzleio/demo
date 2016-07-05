@@ -115,7 +115,7 @@ $scope.getAllEvents = function () {
 };
 ```
 
-We use the [search](https://github.com/kuzzleio/sdk-javascript#search) function of SDK to filter our collection (``kuzzleChannel`` variable) some data containing a field "type" with value "chooseyourday_event".
+We use the [advancedSearch](http://kuzzle.io/sdk-documentation/#advancedsearch) function of SDK to filter our collection (``kuzzleChannel`` variable) some data containing a field "type" with value "chooseyourday_event".
 
 In the callback:
 
@@ -169,7 +169,7 @@ We will not explain this template in great detail (it contains a lot a internal 
 </button>
 ```
 
-In brief, the submission form triggers the ``addEvent()`` function (lines 149-172), which calls the [create](https://github.com/kuzzleio/sdk-javascript#create) function of SDK to send the data to Kuzzle:
+In brief, the submission form triggers the ``addEvent()`` function (lines 149-172), which calls the [createDocument](http://kuzzle.io/sdk-documentation/#createdocument) function of SDK to send the data to Kuzzle:
 
 ```
 kuzzle.dataCollectionFactory(kuzzleChannel, config.index).createDocument({
@@ -185,7 +185,7 @@ So now, we can add events, and refresh the ``/ListEvent`` page to view our list.
 It's cool, but it could be better if we did not need to refresh the page every time to check if there are any new events:
 
 So let's use Kuzzle to be notified when changes are made on the data collection.
-This is done within the controller initialization, using the [subscribe](https://github.com/kuzzleio/sdk-javascript#subscribe) function of SDK:
+This is done within the controller initialization, using the [subscribe](http://kuzzle.io/sdk-documentation/#subscribe) function of SDK:
 
 ``` javascript
 $scope.room = kuzzle.dataCollectionFactory(kuzzleChannel, config.index).subscribe({ "term": { type: "chooseyourday_event" } }, function (error, response) {
@@ -204,14 +204,14 @@ if (error) {
 * 2. if we are notified about a new event: add it to the view
 ```javascript
 if (response.action === "create") {
-    $scope.addToList(response._id, response._source);
+    $scope.addToList(response.result._id, response.result._source);
 }
 ```
 * 3. if we are notified about a deleted event: remove it from the view
 ```javascript
 if (response.action === "delete") {
     $scope.events.some(function (event, index) {
-        if (event._id === response._id) {
+        if (event._id === response.result._id) {
             $scope.events.splice(index, 1);
             return true;
         }
@@ -222,7 +222,7 @@ if (response.action === "delete") {
 ```javascript
 if (response.action === "update") {
     $scope.events.some(function (event, index) {
-        if (event._id === response._id) {
+        if (event._id === response.result._id) {
             $scope.events[index].name = response._source.name;
             $scope.events[index].dates = response._source.dates;
             return true;
@@ -263,7 +263,7 @@ $scope.editEvent = function(id) {
 $scope.isNew = false;
 $scope.viewForm = true;
 ```
-* 2. get the event from Kuzzle, using the [get](https://github.com/kuzzleio/sdk-javascript#get) function of SDK:
+* 2. get the event from Kuzzle, using the [fetchDocument](http://kuzzle.io/sdk-documentation/#fetchdocument) function of SDK:
 ```javascript
 kuzzle.dataCollectionFactory(kuzzleChannel, config.index).fetchDocument(id, function (error, response) {
  (...)
@@ -283,7 +283,7 @@ $scope._event = {
 $scope.$apply();
 ```
 
-Finally, we modify the ``addEvent()`` function to handle the update behaviour, using the [update](https://github.com/kuzzleio/sdk-javascript#update) function of SDK:
+Finally, we modify the ``addEvent()`` function to handle the update behaviour, using the [updateDocument](http://kuzzle.io/sdk-documentation/#updatedocument) function of SDK:
 
 ```javascript
 $scope.addEvent = function () {
@@ -303,11 +303,11 @@ $scope.addEvent = function () {
 
 Finally for this controller, we want to be able to remove an event.
 
-Nothing is easier: just call the [delete](https://github.com/kuzzleio/sdk-javascript#delete) function of SDK (lines 96-98):
+Nothing is easier: just call the [deleteDocument](http://kuzzle.io/sdk-documentation/#deletedocument) function of SDK (lines 96-98):
 
 ```javascript
 $scope.delete = function (index) {
-    kuzzle.dataCollectionFactory(kuzzleChannel, config.index).delete($scope.events[index]._id);
+    kuzzle.dataCollectionFactory(kuzzleChannel, config.index).deleteDocument($scope.events[index]._id);
 };
 ```
 
@@ -334,12 +334,12 @@ var filter = { "filter": { "and": [
     { "term": { "event": $scope.currentEvent._id } }
 ]}};
 ```
-* 2. call the ``search`` function of Kuzzle API to update the participants list and apply the scope:
+* 2. call the ``advancedSearch`` function of Kuzzle API to update the participants list and apply the scope:
 ```javascript
 kuzzle.dataCollectionFactory(kuzzleChannel, config.index).advancedSearch(filter, function (error, response) {
   (...)
   response.documents.forEach(function (participant) {
-      $scope.addToParticipants(participant._id, participant._source);
+      $scope.addToParticipants(participant.id, participant.content);
   });
   $scope.$apply();
 });
@@ -367,7 +367,7 @@ var terms = { "and": [
 $scope.roomId = kuzzle.dataCollectionFactory(kuzzleChannel, config.index).subscribe(terms, function (error, response) {
     (...)
     if (response.action === "create") {
-        $scope.addToParticipants(response._id, response._source);
+        $scope.addToParticipants(response.result._id, response.result._source);
     }
     if (response.action === "delete") {
         $scope.participants.some(function (participant, index) {
@@ -379,9 +379,9 @@ $scope.roomId = kuzzle.dataCollectionFactory(kuzzleChannel, config.index).subscr
     }
     if (response.action === "update") {
         $scope.participants.some(function (participant, index) {
-            if (participant._id === response._id) {
-                $scope.participants[index].name = response._source.name;
-                $scope.participants[index].answers = response._source.answers;
+            if (participant._id === response.result._id) {
+                $scope.participants[index].name = response.result._source.name;
+                $scope.participants[index].answers = response.result._source.answers;
                 return true;
             }
         });
@@ -409,7 +409,7 @@ $scope.createParticipant = function () {
 
 ### Update a vote
 
-We can also modify an existing vote with the ``updateParticipant()`` function (lines 241-247), which uses the ``update`` function of Kuzzle SDK:
+We can also modify an existing vote with the ``updateParticipant()`` function (lines 241-247), which uses the ``updateDocument`` function of Kuzzle SDK:
 
 ```javascript
 kuzzle.dataCollectionFactory(kuzzleChannel, config.index).updateDocument(participant._id, {

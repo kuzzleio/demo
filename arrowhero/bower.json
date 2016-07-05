@@ -1,5 +1,5 @@
 {
-  "name": "Kuzzle arrow hero demo",
+  "name": "arrow_hero_demo",
   "homepage": "https://github.com/kuzzleio/demo",
   "authors": [
     "OSTALOWSKI Bastien",
@@ -14,7 +14,7 @@
     "bower_components"
   ],
   "dependencies": {
-    "kuzzle-sdk": "1.7.2",
+    "kuzzle-sdk": "1.9.1",
     "jquery": "2.1.4"
   }
 }

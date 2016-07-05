@@ -18,12 +18,14 @@ This tutorial will try to show you how to make some geospatial searchs and filte
 Since Kuzzle is using ElasticSearch as a datastorage, geospatial search and filters will need to have the right mapping in ElasticSearch.
 
 To do so, you have the choice between:
+
 * put the mapping before your application starts
 * put the mapping when the first client connects
 
 As we wanted the Cabble demo as simple as possible, we've choosen the second choice: at the very early stage of the application launch, we retrieve the mapping of the geospatial collection, test if the geospatial field is right, and if not, we put the right mapping into it.
 
-Here is an example: 
+Here is an example:
+
 ```js
 var collection;
 var mapping = {
@@ -33,47 +35,48 @@ var mapping = {
 };
 
 var kuzzle = new Kuzzle(
-	'http://localhost:7512', 
-	{autoReconnect: true}, 
-	function(err, res) {
-		// handle a collection named "users"
-		collection = kuzzle.dataCollectionFactory('users');
-		// get the current mapping
-		collection.getMapping(function(err, res) {
-			if (res === undefined) {
-				// if the collection does not exists yet 
-				// of have been created but have nor mapping or document in it
-				// res will be === undefined
-				collection.putMapping(mapping, function(err, res){
-					// handle errors etc
-				});		
-			} else {
-				// the collection already have a mapping...
-				// here you may have a problem since ElasticSearch will refuse
-				// to put the geo_point type on some kind of fields
-				// the best solution here is to empty the collection then 
-				// to put the mapping
-				collection.delete(function (err, res) {
-					collection = kuzzle.dataCollectionFactory('users');
-					collection.putMapping(mapping, function(err, res){
-						// handle errors etc
-					});		
-				});
-			}
-		});
-	}
+  'http://localhost:7512',
+  {autoReconnect: true, defaultIndex: 'cabble'},
+  function(err, res) {
+    // handle a collection named "users"
+    collection = kuzzle.dataCollectionFactory('users');
+    // get the current mapping
+    collection.getMapping(function(err, res) {
+      if (res === undefined) {
+        // if the collection does not exists yet
+        // of have been created but have nor mapping or document in it
+        // res will be === undefined
+        collection.putMapping(mapping, function(err, res){
+          // handle errors etc
+        });		
+      } else {
+        // the collection already have a mapping...
+        // here you may have a problem since ElasticSearch will refuse
+        // to put the geo_point type on some kind of fields
+        // the best solution here is to empty the collection then
+        // to put the mapping
+        collection.delete(function (err, res) {
+          collection = kuzzle.dataCollectionFactory('users');
+          collection.putMapping(mapping, function(err, res){
+            // handle errors etc
+          });		
+        });
+      }
+    });
+  }
 );
 ```
 
-Please refer to the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/1.7/mapping-geo-point-type.html) to learn how to write the mapping.
+Please refer to the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/geo-point.html) to learn how to write the mapping.
 
-**Remember:** no geospatial search or filter will work if the mapping is wrong.
+**Remember:** no geospatial search or filter will work without the right mappings
 
 ## Advanced search
 
 In Cabble, when a new user is connecting, we need to populate the map with the other relevant actually connected users. To do so, we do an advanced search with a geospatial filter.
 
-Here is an example of such a query: 
+Here is an example of such a query:
+
 ```javascript
 var query = {
   query: {
@@ -106,7 +109,7 @@ var query = {
   }
 };
 collection.advancedSearch(query, function (err, res) {
-// res will be like: 
+// res will be like:
 {
   documents: [ an array of kuzzle documents],
   total: the number of matching documents
@@ -115,15 +118,16 @@ collection.advancedSearch(query, function (err, res) {
 
 ```
 
-You can refer to the [ElasticSearch Filters documentation](https://www.elastic.co/guide/en/elasticsearch/reference/1.7/query-dsl-geo-bounding-box-filter.html) to learn more about the geospatial filters.
+You can refer to the [ElasticSearch Filters documentation](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/query-dsl-geo-bounding-box-query.html) to learn more about the geospatial filters.
 
 ## Subscriptions
 
 In order to be warned when a new user is entering the current scope (10km around the current user position) and put it onto the map, we need to create a room, like a kind of chatroom, based on a filter.
 
-Fortunately, the [Kuzzle DSL](https://github.com/kuzzleio/kuzzle/blob/master/docs/filters.md) is matching the ElasticSearch DSL so that the subscription filter is quite the same as the advanced search.
+Fortunately, the [Kuzzle DSL](http://kuzzle.io/guide/#filtering-syntax) is matching the ElasticSearch DSL so that the subscription filter is quite the same as the advanced search.
 
-The [subscription](http://kuzzleio.github.io/sdk-documentation/#subscribe) is done like this:
+The [subscription](http://kuzzle.io/sdk-documentation/#subscribe) is done like this:
+
 ```javascript
 var filter: {
   and: [
@@ -147,11 +151,12 @@ var filter: {
     }
   ]
 };
+
 var room = collection.subscribe(
-  filter, 
-  {subscribeToSelf: false}, 
+  filter,
+  {subscribeToSelf: false},
   function(err, res) {
-  	// this callback will be called each time a new document is 
+    // this callback will be called each time a new document is
     // changing (entering or exiting the scope too)
     // res is a kuzzle document
   }
@@ -163,4 +168,4 @@ var room = collection.subscribe(
 
 ### Keep moving
 
-If the user moves, we need to refresh the search zone. This means that we have to unsubscribe to the current room, then to resubscribe to a new one. Sounds heavy, but it is not: we can use the [renew](http://kuzzleio.github.io/sdk-documentation/#renew) method on the room with a new filter to automagically do all the process.
+If the user moves, we need to refresh the search zone. This means that we have to unsubscribe to the current room, then to resubscribe to a new one. Sounds heavy, but it is not: we can use the [renew](http://kuzzle.io/sdk-documentation/#renew) method on the room with a new filter to automagically do all the process.

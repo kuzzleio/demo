@@ -149,8 +149,8 @@ ConnectingState.prototype = {
     connectText.setText("Connecting to server...\nOK!");
 
     kuzzle
-      .dataCollectionFactory(Configuration.server.kuzzleIndex, Room.id)
-      .subscribe({}, {scope: 'none', users: 'none', subscribeToSelf: false}, function (error, data) {
+      .dataCollectionFactory(Room.id, Configuration.server.kuzzleIndex)
+      .subscribe({}, {users: 'none', subscribeToSelf: false}, function (error, data) {
         switch (data.result._source.event) {
           case Configuration.events.PLAYER_JOINED:
             if (data.result._source.player.id !== game.player.id) {
@@ -263,9 +263,9 @@ ConnectingState.prototype = {
       });
     self.subscribed = true;
     connectTextTweenOut.start();
-
+console.log('SENDING TO ', Room.id, ': ', {event: Configuration.events.PLAYER_JOINED, player: game.player});
     kuzzle
-      .dataCollectionFactory(Configuration.server.kuzzleIndex, Room.id)
+      .dataCollectionFactory(Room.id, Configuration.server.kuzzleIndex)
       .publishMessage({event: Configuration.events.PLAYER_JOINED, player: game.player});
 
     if (Room.state === 'game_launched') {
@@ -294,7 +294,7 @@ ConnectingState.prototype = {
     };
 
     kuzzle
-      .dataCollectionFactory(Configuration.server.kuzzleIndex, Configuration.server.room)
+      .dataCollectionFactory(Configuration.server.room, Configuration.server.kuzzleIndex)
       .subscribe({}, {metadata: game.player, subscribeToSelf: false}, function (error, data) {
         if (data.result._source.id === myId) {
           Room = data.result._source.room;

@@ -37,7 +37,6 @@ Poker.planning.homePage = {
                 var roomName = $("input[id=roomName]").val().trim();
                 if(roomName != "") {
                     Poker.planning.RoomManager.createRoom(roomName, function() {
-                        console.log('create');
                         $("input[id=roomName]").val("");
                         $(".room-creation-container").removeClass("open");
                         $('#createSessionModal').modal('hide');
@@ -54,12 +53,12 @@ Poker.planning.homePage = {
             };
             Poker.planning.pokerPage.roomIdSubscription = Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).subscribe(subscriptionFilters, function(error, response) {
                 if(error) {
-                    console.log("Error in homePage.run() function when subscribing to room update.")
+                    console.error("Error in homePage.run() function when subscribing to room update.")
                     console.error(error);
                 }
                 else {
                     if(response.action == "delete") {
-                        Poker.planning.RoomManager.removeRoomFromList(response._id);
+                        Poker.planning.RoomManager.removeRoomFromList(response.result._id);
                     }
                     else {
                         Poker.planning.RoomManager.updateOrCreateRoom(response);
@@ -107,4 +106,3 @@ Poker.planning.homePage = {
     }
 
 }
-
