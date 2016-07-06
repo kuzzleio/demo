@@ -19,7 +19,6 @@ Poker.planning.loginPage = {
         Poker.planning.setTitle("Welcome to Kuzzle Planning Poker");
 
         $("body").addClass("login");
-
         $('.form-login').submit(function(){
             var input = $('.form-login input[type=text]');
 
@@ -36,4 +35,3 @@ Poker.planning.loginPage = {
         window.location.href = "index.html";
     }
 }
-

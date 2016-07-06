@@ -59,7 +59,6 @@ Poker.planning = {
 
         // function to execute after rooms have been loaded from Kuzzle
         var postConfig = function() {
-
             // loading GET parameters
             var page = Poker.planning.getParameter("page");
             switch(page) {
@@ -90,7 +89,9 @@ Poker.planning = {
      */
     loadPage: function(url, callback)
     {
-        $.ajax(url, {
+        $.ajax({
+            url: url,
+            dataType: 'html',
             success: function(data, textStatus, jqXHR) {
                 $('#content').html(data);
                 callback();

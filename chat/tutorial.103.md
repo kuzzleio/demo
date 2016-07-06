@@ -89,7 +89,7 @@ ChatRoom.prototype.unsubscribe = function () {
 };
 ```
 
-This method just calls the [KuzzleRoom unsubscribe](http://kuzzleio.github.io/sdk-documentation/#unsubscribe) method and updates the current object state.
+This method just calls the [KuzzleRoom unsubscribe](http://kuzzle.io/sdk-documentation/#unsubscribe) method and updates the current object state.
 
 ## Adding a new model for the room list
 
@@ -126,7 +126,7 @@ This method just calls the [KuzzleRoom unsubscribe](http://kuzzleio.github.io/sd
 
 ```
 
-We first declare a new [Angular service](https://docs.angularjs.org/guide/services) that returns a [KuzzleDataCollection](http://kuzzleio.github.io/sdk-documentation/#kuzzledatacollection) object.
+We first declare a new [Angular service](https://docs.angularjs.org/guide/services) that returns a [KuzzleDataCollection](http://kuzzle.io/sdk-documentation/#kuzzledatacollection) object.
 
 We will use this new collection to store and persist the list of available rooms.
 
@@ -231,7 +231,7 @@ ChatRoomList.prototype.getAll = function () {
 };
 ```
 
-This method is called only once, by the constructor. It uses the [KuzzleDataCollection fetchAllDocuments](http://kuzzleio.github.io/sdk-documentation/#fetchalldocuments) method to retrieve the list of persisted documents for the collection.
+This method is called only once, by the constructor. It uses the [KuzzleDataCollection fetchAllDocuments](http://kuzzle.io/sdk-documentation/#fetchalldocuments) method to retrieve the list of persisted documents for the collection.
 
 From the returned list, it fills the ChatRoomList `all` property.
 
@@ -273,7 +273,7 @@ ChatRoomList.prototype.addNewRoom = function (name) {
 };
 ```
 
-Given a room name, this method will create a new [KuzzleDocument](http://kuzzleio.github.io/sdk-documentation/#kuzzledocument) and persist it in Kuzzle.
+Given a room name, this method will create a new [KuzzleDocument](http://kuzzle.io/sdk-documentation/#kuzzledocument) and persist it in Kuzzle.
 
 Once the object is persisted, on the callback, it adds a new matching ChatRoom object to the internal list.
 

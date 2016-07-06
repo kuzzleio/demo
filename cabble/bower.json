@@ -27,6 +27,6 @@
     "bootstrap": "~3.3.6",
     "mustache.js": "mustache#~2.2.1",
     "lodash": "~3.10.1",
-    "kuzzle-sdk": "1.7.2"
+    "kuzzle-sdk": "1.9.1"
   }
 }

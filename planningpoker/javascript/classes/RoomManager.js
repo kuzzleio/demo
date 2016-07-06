@@ -79,7 +79,7 @@ Poker.planning.RoomManager = {
                     var roomInfos = response.documents[i];
                     var room = new Poker.planning.Room();
                     room.datas = roomInfos.content;
-                    room.id(roomInfos._id);
+                    room.id(roomInfos.id);
                     Poker.planning.RoomManager._rooms[room.id()] = room;
                 }
 
@@ -97,7 +97,6 @@ Poker.planning.RoomManager = {
      */
     removeRoom: function(roomId, callback)
     {
-        console.log('removeroom');
         if(roomId == undefined) {
             return false;
         }
@@ -136,13 +135,13 @@ Poker.planning.RoomManager = {
      * @param kuzzleResponse
      */
     updateOrCreateRoom: function(kuzzleResponse) {
-        if(Poker.planning.RoomManager.rooms()[kuzzleResponse._id] != undefined) {
-            Poker.planning.RoomManager.rooms()[kuzzleResponse._id].refresh(kuzzleResponse._id, kuzzleResponse.result._source);
+        if(Poker.planning.RoomManager.rooms()[kuzzleResponse.result._id] != undefined) {
+            Poker.planning.RoomManager.rooms()[kuzzleResponse.result._id].refresh(kuzzleResponse.result._id, kuzzleResponse.result._source);
         }
         else {
             var room = new Poker.planning.Room();
-            room.refresh(kuzzleResponse._id, kuzzleResponse.result._source);
-            Poker.planning.RoomManager._rooms[kuzzleResponse._id] = room;
+            room.refresh(kuzzleResponse.result._id, kuzzleResponse.result._source);
+            Poker.planning.RoomManager._rooms[kuzzleResponse.result._id] = room;
         }
     }
 

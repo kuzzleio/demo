@@ -6,7 +6,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "kuzzle-sdk": "1.7.2",
+    "kuzzle-sdk": "1.9.1",
     "jquery": "2.1.4",
     "bootstrap": "~3.3.5"
   }

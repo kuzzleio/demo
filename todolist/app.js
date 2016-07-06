@@ -8,6 +8,7 @@ angular.module("KuzzleTodoDemo", [])
   })
   // KuzzleDataCollection on which the messages are submited
   .factory('kuzzleMessagesCollection', ['kuzzle', function (kuzzle) {
+    console.log('listening to ', config.appIndex, ' / ', config.todoCollection);
     return kuzzle.dataCollectionFactory(config.todoCollection);
   }])
   .controller("KuzzleTodoController", ["$scope", 'kuzzleMessagesCollection', function($scope, kuzzleMessagesCollection) {
@@ -15,13 +16,13 @@ angular.module("KuzzleTodoDemo", [])
     $scope.todos = [];
 
     $scope.init = function () {
-      kuzzleMessagesCollection.subscribe({},
-        function(error, response) {
+      console.log('subscribing')
+      kuzzleMessagesCollection.subscribe({}, function (error, response) {
           if (error) {
             console.error("[Kuzzle]:" + error.message);
             return;
           }
-
+          console.log('RESPONSE = ', response);
           // In case the action is "create", we call the addToList action
           if(response.action === "create") {
             var newTodo = {

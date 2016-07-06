@@ -1,4 +1,4 @@
-var kuzzle = new Kuzzle(config.kuzzleUrl);
+var kuzzle = new Kuzzle(config.kuzzleUrl, {defaultIndex: config.index});
 var kuzzleChannel = "chooseyourday";
 var chooseYourDay = angular.module("chooseyourday", [
   "ngRoute",
@@ -30,7 +30,7 @@ chooseYourDay.controller("ListEventController", ["$scope", "$location", function
     $scope.getAllEvents();
     moment.locale('en');
 
-    $scope.room = kuzzle.dataCollectionFactory(config.index, kuzzleChannel).subscribe({"term": {type: "chooseyourday_event"}}, function (error, response) {
+    $scope.room = kuzzle.dataCollectionFactory(kuzzleChannel).subscribe({"term": {type: "chooseyourday_event"}}, function (error, response) {
 
       if (error) {
         console.error(error);
@@ -69,7 +69,7 @@ chooseYourDay.controller("ListEventController", ["$scope", "$location", function
   });
 
   $scope.getAllEvents = function () {
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).advancedSearch({"filter": {"term": {type: "chooseyourday_event"}}}, function (error, response) {
+    kuzzle.dataCollectionFactory(kuzzleChannel).advancedSearch({"filter": {"term": {type: "chooseyourday_event"}}}, function (error, response) {
       if (error) {
         console.error(error);
         return false;
@@ -94,7 +94,7 @@ chooseYourDay.controller("ListEventController", ["$scope", "$location", function
   };
 
   $scope.delete = function (index) {
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).deleteDocument($scope.events[index]._id);
+    kuzzle.dataCollectionFactory(kuzzleChannel).deleteDocument($scope.events[index]._id);
   };
 
   $scope.newEvent = function () {
@@ -114,7 +114,7 @@ chooseYourDay.controller("ListEventController", ["$scope", "$location", function
   $scope.editEvent = function (id) {
     $scope.isNew = false;
     $scope.viewForm = true;
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).fetchDocument(id, function (error, response) {
+    kuzzle.dataCollectionFactory(kuzzleChannel).fetchDocument(id, function (error, response) {
       if (error) {
         console.error(error);
         return false;
@@ -148,13 +148,13 @@ chooseYourDay.controller("ListEventController", ["$scope", "$location", function
 
   $scope.addEvent = function () {
     if ($scope.isNew) {
-      kuzzle.dataCollectionFactory(config.index, kuzzleChannel).createDocument({
+      kuzzle.dataCollectionFactory(kuzzleChannel).createDocument({
         "type": "chooseyourday_event",
         "name": $scope._event.name,
         "dates": $scope._event.dates
       });
     } else {
-      kuzzle.dataCollectionFactory(config.index, kuzzleChannel).updateDocument($scope._event._id, {
+      kuzzle.dataCollectionFactory(kuzzleChannel).updateDocument($scope._event._id, {
         "type": "chooseyourday_event",
         "name": $scope._event.name,
         "dates": $scope._event.dates
@@ -179,7 +179,7 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
   $scope.room = null;
 
   $scope.init = function () {
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).fetchDocument($routeParams.eventId, function (error, response) {
+    kuzzle.dataCollectionFactory(kuzzleChannel).fetchDocument($routeParams.eventId, function (error, response) {
       if (error) {
         console.error(error);
         return false;
@@ -202,7 +202,7 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
   };
 
   $scope.createParticipant = function () {
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).createDocument({
+    kuzzle.dataCollectionFactory(kuzzleChannel).createDocument({
       "type": "chooseyourday_p",
       "name": $scope.newParticipant.name,
       "answers": $scope.newParticipant.answers,
@@ -217,7 +217,7 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
   };
 
   $scope.removeParticipant = function (index) {
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).deleteDocument($scope.participants[index]._id);
+    kuzzle.dataCollectionFactory(kuzzleChannel).deleteDocument($scope.participants[index]._id);
   };
 
   $scope.initNewParticipant = function () {
@@ -239,7 +239,7 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
   };
 
   $scope.updateParticipant = function (participant) {
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).updateDocument(participant._id, {
+    kuzzle.dataCollectionFactory(kuzzleChannel).updateDocument(participant._id, {
       "name": participant.name,
       "answers": participant.answers
     });
@@ -260,7 +260,7 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
       }
     };
 
-    kuzzle.dataCollectionFactory(config.index, kuzzleChannel).advancedSearch(filter, function (error, response) {
+    kuzzle.dataCollectionFactory(kuzzleChannel).advancedSearch(filter, function (error, response) {
       if (error) {
         console.error(error);
         return false;
@@ -281,7 +281,7 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
       ]
     };
 
-    $scope.room = kuzzle.dataCollectionFactory(config.index, kuzzleChannel).subscribe(terms, function (error, response) {
+    $scope.room = kuzzle.dataCollectionFactory(kuzzleChannel).subscribe(terms, function (error, response) {
       if (error) {
         console.error(error);
         return false;

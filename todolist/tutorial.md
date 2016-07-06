@@ -47,7 +47,7 @@ Our TODOs will be managed by the `KuzzleTodoDemoMessages` collection in Kuzzle: 
 ```js
 // setup kuzzle as an Angular service
 .factory('kuzzle', function () {
-  return new Kuzzle(config.kuzzleUrl);
+  return new Kuzzle(config.kuzzleUrl, {defaultIndex: config.appIndex});
 })
 // KuzzleDataCollection on which the messages are submitted
 .factory('kuzzleMessagesCollection', ['kuzzle', function (kuzzle) {
@@ -77,7 +77,7 @@ If so, we are the first user to run the application and we create the initial da
 :bulb: In order to receive some notifications on documents in Kuzzle, these need to be linked to the notification rooms. In the deletion case, for the time being, this implies creating the documents _after_ we have subscribed to the notification room.
 
 If the database is already initialized, we ask Kuzzle to get us all the existing documents in the `KuzzleTodoDemoMessages` collection.
-The method that the Javascript SDK provides for this purpose is [`advancedSearch`](https://kuzzleio.github.io/sdk-documentation/#advancedsearch).
+The method that the Javascript SDK provides for this purpose is [`advancedSearch`](http://kuzzle.io/sdk-documentation/#advancedsearch).
 It takes the following arguments:
 
 * a query filter (since we want all the documents, we leave it empty),

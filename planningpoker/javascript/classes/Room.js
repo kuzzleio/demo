@@ -169,8 +169,8 @@ Poker.planning.Room = function()
     {
         var context = this;
         if(this.id() == "") { // creation
-
             this.id(UUID());
+
             Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).createDocument(this.datas, function (error, response) {
                 if(error) {
                     console.error(error);
@@ -187,7 +187,6 @@ Poker.planning.Room = function()
                         var rooms = Poker.planning.RoomManager.rooms();
 
                         Poker.planning.RoomManager.rooms()[context.id()] = context;
-
                         if(callback != undefined) {
                             callback();
                         }
@@ -197,8 +196,7 @@ Poker.planning.Room = function()
             });
         }
         else { // update
-
-            Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).updateDocument(this.datas.id, this.datas, function (error, response) {
+            Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).updateDocument(this.datas._id, this.datas, function (error, response) {
                 if(error) {
                     console.error(error);
                 }
@@ -212,5 +210,3 @@ Poker.planning.Room = function()
     }
 
 }
-
-

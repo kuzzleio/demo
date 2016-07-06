@@ -70,7 +70,7 @@ We need to pass the appropriate options when making a subscription to receive th
 // Listening to connected/disconnected players
 kuzzle
   .dataCollectionFactory(Configuration.server.room)
-  .subscribe({}, {scope: 'none', users: 'all'}, (error, data) => {
+  .subscribe({}, {users: 'all'}, (error, data) => {
     var
     roomId,
     players = [];
@@ -106,7 +106,7 @@ This snippet starts line 25 of the ``server/tournament_server.js`` file.
 The ``data.action`` variable tells the server if the received notification is about a new subscription occurring on the room (``data.action === 'on'``), or if a connected user left it (``data.action === 'off'``).  
 Depending of this information, the game server takes the appropriate action by adding the player to the game, or by removing it.
 
-For more information about subscription configuration, see the KuzzleRoom constructor in [SDK Documentation](http://kuzzleio.github.io/sdk-documentation/?javascript#constructors52)
+For more information about subscription configuration, see the KuzzleRoom constructor in [SDK Documentation](http://kuzzle.io/sdk-documentation/#constructors71)
 
 # Adding information to subscriptions
 
@@ -145,4 +145,4 @@ More importantly, these metadata are stored by Kuzzle, and forwarded once again 
 
 Using these metadata, the game server can now get the information it needs to manage players and their associated rooms.
 
-For more information about query metadata, you can check [Kuzzle API Documentation](https://github.com/kuzzleio/kuzzle/blob/master/docs/API.WebSocket.md#sending-metadata)
+For more information about query metadata, you can check [Kuzzle API Documentation](http://kuzzle.io/api-reference/?websocket#sending-metadata)

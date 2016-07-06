@@ -371,7 +371,7 @@ GameRoundNoMonsterState.prototype = {
     if(game.player.isAlive && game.time.now > updateTimer && live) {
       updateTimer = game.time.now + updateRate;
 
-      kuzzle.dataCollectionFactory(Configuration.server.kuzzleIndex, Room.id).publishMessage({
+      kuzzle.dataCollectionFactory(Room.id, Configuration.server.kuzzleIndex).publishMessage({
         event    : Configuration.events.PLAYER_UPDATE,
         id       : game.player.id,
         look     : game.player.look,
@@ -884,7 +884,7 @@ GameRoundNoMonsterState.prototype = {
       game.add.tween(gameOverMessage).to({alpha: 1.0}, 1500, Phaser.Easing.Exponential.Out, true);
     });
 
-    kuzzle.dataCollectionFactory(Configuration.server.kuzzleIndex, Room.id).publishMessage({ event: Configuration.events.PLAYER_DIE, player: game.player });
+    kuzzle.dataCollectionFactory(Room.id, Configuration.server.kuzzleIndex).publishMessage({ event: Configuration.events.PLAYER_DIE, player: game.player });
   },
 
   prepareToGameEnd: function (winner) {

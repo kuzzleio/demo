@@ -18,7 +18,7 @@
 
   initServer: function(cb) {
     if (!this.kuzzle) { // if it has not be done yet...
-      this.kuzzle = new Kuzzle(this.server, cb);
+      this.kuzzle = new Kuzzle(this.server, {defaultIndex: this.mainIndex}, cb);
     }
   },
 
@@ -54,7 +54,7 @@
       }
     };
 
-    KuzzleGame.KuzzleManager.kuzzle.dataCollectionFactory(this.mainIndex, this.mainRoom).advancedSearch(filters, (error, response) => {
+    KuzzleGame.KuzzleManager.kuzzle.dataCollectionFactory(this.mainRoom).advancedSearch(filters, (error, response) => {
       if (error) {
         console.error(error);
       }
@@ -82,7 +82,7 @@
 
     KuzzleGame.KuzzleManager.log('registering as host');
 
-    this.kuzzle.dataCollectionFactory(this.mainIndex, "kg_main_room").createDocument({
+    this.kuzzle.dataCollectionFactory("kg_main_room").createDocument({
       hostID: this.uniquid,
       hostDifficulty: KuzzleGame.Difficulty.currentDifficulty
     }, function(error, response) {
@@ -132,7 +132,7 @@
     if (typeof(clearHostId) === 'undefined') clearHostId = true;
 
 
-    this.kuzzle.dataCollectionFactory(this.mainIndex, this.mainRoom).deleteDocument(filters, (error, response) => {
+    this.kuzzle.dataCollectionFactory(this.mainRoom).deleteDocument(filters, (error, response) => {
 
       if (error) {
         console.error(error);
@@ -163,7 +163,7 @@
    */
   createHostSubChannel: function() {
     if (this.hostID) {
-      this.kuzzle.dataCollectionFactory(this.mainIndex, "kg_room_" + this.hostID).createDocument({
+      this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).createDocument({
         hostID: this.hostID
       }, (error, response) => {
         if (error) {
@@ -190,7 +190,7 @@
       }
     };
 
-    this.kuzzle.dataCollectionFactory(this.mainIndex, "kg_room_" + this.hostID).deleteDocument(filters, (error, response) => {
+    this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).deleteDocument(filters, (error, response) => {
       if (error) {
         console.error(error);
       }
@@ -214,7 +214,7 @@
       }
     };
 
-    this.kuzzle.dataCollectionFactory(this.mainIndex, "kg_room_" + this.hostID).subscribe(filters, this.fireEvent);
+    this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).subscribe(filters, this.fireEvent);
 
   },
 
@@ -252,7 +252,7 @@
    * @param value
    */
   throwEvent: function(eventType, value) {
-    this.kuzzle.dataCollectionFactory(this.mainIndex, "kg_room_" + this.hostID).createDocument({
+    this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).createDocument({
       event: "kg_event",
       event_type: eventType,
       event_value: value,

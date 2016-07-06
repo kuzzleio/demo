@@ -42,10 +42,10 @@ Poker.planning.pokerPage = {
         var nickname = Poker.planning.getParameter("nickname");
         var roomid = Poker.planning.getParameter("roomid");
 
-        if(nickname == false && roomid == false) { // return to login page if nickname or roomid parameter is missing
+        if(nickname == false && !roomid) { // return to login page if nickname or roomid parameter is missing
             Poker.planning.loginPage.redirectToThisPage();
         }
-        else if(roomid == false) {
+        else if(!roomid) {
             Poker.planning.nickname(nickname);
             Poker.planning.homePage.redirectToThisPage();
         }
@@ -155,9 +155,10 @@ Poker.planning.pokerPage = {
                     copy_id: Poker.planning.RoomManager.currentRoom().copyId()
                 }
             };
+
             Poker.planning.pokerPage.roomIdSubscription = Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).subscribe(subscriptionFilters, function(error, response) {
                 if(error) {
-                    console.log("Error in pokerPage.run() function when subscribing to room update.");
+                    console.error("Error in pokerPage.run() function when subscribing to room update.");
                     console.error(error);
                 }
                 else {
@@ -167,7 +168,7 @@ Poker.planning.pokerPage = {
                         Poker.planning.homePage.redirectToThisPage();
                     }
                     else {
-                        Poker.planning.RoomManager.currentRoom().refresh(response.id, response.result._source);
+                        Poker.planning.RoomManager.currentRoom().refresh(response.result._id, response.result._source);
                         Poker.planning.pokerPage.display();
                     }
                 }
@@ -193,7 +194,7 @@ Poker.planning.pokerPage = {
                             break;
 
                         default:
-                            console.log("undefined poker action", body);
+                            console.error("undefined poker action", body);
                             break;
                     }
                 }
@@ -324,7 +325,7 @@ Poker.planning.pokerPage = {
             },
             function(error, response) {
                 if(error) {
-                    console.log("Error in pokerPage.vote function");
+                    console.error("Error in pokerPage.vote function");
                     console.error(error);
                 }
             }
@@ -368,9 +369,9 @@ Poker.planning.pokerPage = {
         if(Poker.planning.pokerPage.isVoting == false) {
             Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.pokerPage.KUZZLE_POKER_ACTION_COLLECTION).createDocument(
             {
-                action: Poker.planning.pokerPage.ACTION_LAUNCH_VOTE, 
+                action: Poker.planning.pokerPage.ACTION_LAUNCH_VOTE,
                 roomid: Poker.planning.RoomManager.currentRoom().id()
-            }, 
+            },
             function(error, response) {
                 if(error) {
                     console.error(error);
@@ -470,4 +471,3 @@ Poker.planning.pokerPage = {
     }
 
 }
-

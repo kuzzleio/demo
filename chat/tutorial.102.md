@@ -41,7 +41,7 @@ ChatRoom.prototype.refreshUserCount = function () {
 };
 ```
 
-This method calls the [KuzzleRoom count](http://kuzzleio.github.io/sdk-documentation/#count45) method to get the number of subscribers.
+This method calls the [KuzzleRoom count](http://kuzzle.io/sdk-documentation/#count73) method to get the number of subscribers.
 
 We then need to slightly modify our constructor to add the new userCount property and call the newly created method.
 
