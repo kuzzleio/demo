@@ -8,7 +8,7 @@ demo:
     - "80:80"
 
 kuzzle:
-  image: kuzzleio/kuzzle:1.0.0-RC3
+  image: kuzzleio/kuzzle:1.0.0-RC4
   volumes:
     - "./fixtures.json:/fixtures.json"
   ports:
