@@ -5,15 +5,20 @@ demo:
   ports:
     - "80:80"
 
+proxy:
+  image: kuzzleio/proxy:alpine
+  ports:
+    - "7511:7511"
+    - "7512:7512"
+    
 kuzzle:
   image: kuzzleio/kuzzle:1.0.0-RC4
   volumes:
     - "./defaultMapping.json:/defaultMapping.json"
-  ports:
-    - "7512:7512"
   links:
     - elasticsearch
     - redis
+    - proxy:api
   environment:
     - LIKE_A_VIRGIN=1
     - DEFAULT_MAPPING=/defaultMapping.json

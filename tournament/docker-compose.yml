@@ -11,13 +11,18 @@ server:
   volumes:
     - ".:/var/app/server"
 
+proxy:
+  image: kuzzleio/proxy:alpine
+  ports:
+    - "7511:7511"
+    - "7512:7512"
+    
 kuzzle:
   image: kuzzleio/kuzzle:1.0.0-RC4
-  ports:
-    - "7512:7512"
   links:
     - elasticsearch
     - redis
+    - proxy:api
 
 redis:
   image: redis:3.0-alpine
