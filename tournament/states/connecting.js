@@ -110,10 +110,27 @@ ConnectingState.prototype = {
   },
 
   connectToKuzzle: function () {
-    kuzzle = new Kuzzle(this.game.kuzzleUrl, {autoReconnect: false});
+    self.subscribed = false;
 
-    kuzzle.addListener('disconnected', function () {
-      game.stateTransition.to('main-menu');
+    if (typeof kuzzle !== 'undefined') {
+      kuzzle.logout();
+      kuzzle.disconnect();
+      kuzzle.flushQueue();
+      delete kuzzle;
+    }
+
+    kuzzle = new Kuzzle(this.game.kuzzleUrl, {
+      autoReconnect: false,
+      ioPort: 7512,
+      wsPort: 7513
+    }, function (error) {
+      if (error) {
+        console && console.error(error);
+      }
+
+      kuzzle.addListener('disconnected', function () {
+        game.stateTransition.to('main-menu');
+      });
     });
 
     connectText = this.game.add.text(320, 180, "Connecting to server...\n");
@@ -232,6 +249,7 @@ ConnectingState.prototype = {
 
           case Configuration.events.NOT_ENOUGH_PLAYERS:
             kuzzle.logout();
+            delete kuzzle;
             game.stateTransition.to('not-enough-players');
             break;
 

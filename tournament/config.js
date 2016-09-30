@@ -8,7 +8,7 @@ var Configuration = {
     room: 'tournament-server-room',
     minPlayersPerRoom: 2,
     maxPlayersPerRoom: 8,
-    kuzzleUrl: 'http://localhost:7512',
+    kuzzleUrl: 'localhost',
     kuzzleIndex: 'tournament'
   },
 
@@ -27,8 +27,9 @@ var Configuration = {
   }
 };
 
-(function () {
-  if (typeof module === 'object' && module.exports) {
+if (typeof module === 'object' && module.exports) {
   module.exports = Configuration;
-  }
-})();
+} else {
+  // running in the browser
+  Configuration.server.kuzzleUrl = window.location.hostname;
+}

@@ -4,13 +4,13 @@
   "version": "0.1.0",
   "description": "Kuzzle Tournament Server. Manages users and rooms for Kuzzle Tournament.",
   "scripts": {
-    "start": "npm install && node ./server/tournament_server.js"
+    "start": "sh ./server/start.sh"
   },
   "dependencies": {
     "captains-log": "^0.11.11",
     "lodash": "^3.10.1",
     "node-uuid": "^1.4.7",
-    "kuzzle-sdk": "1.9.2"
+    "kuzzle-sdk": "2.1.4"
   },
   "repository": {
     "type": "git",

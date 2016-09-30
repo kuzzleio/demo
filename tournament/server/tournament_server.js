@@ -13,9 +13,10 @@ var
 startServer();
 
 function startServer() {
-  kuzzle = new Kuzzle(Configuration.server.kuzzleUrl, function (err, res) {
+  kuzzle = new Kuzzle('proxy', function (err, res) {
     if (err) {
       logger.error('Cannot connect to Kuzzle instance: ', err);
+      process.exit(1);
       return false;
     }
 
@@ -28,6 +29,8 @@ function startServer() {
         var
         roomId,
         players = [];
+
+    console.log(data);
 
         if (data.action === 'on') {
           logger.info('New player: ', data.metadata.username, ' - ', data.metadata.id);
@@ -100,7 +103,7 @@ function createRoom () {
   logger.info('Creating new room: ', roomId);
   Rooms[roomId] = room;
 
-  subscribedRoom = kuzzleRoom.subscribe({}, {users: 'none'}, function (error, data) {
+  kuzzleRoom.subscribe({}, {users: 'none'}, function (error, data) {
     var alivePlayer = [];
 
     switch (data.result._source.event) {
@@ -137,6 +140,12 @@ function createRoom () {
         checkWinner(roomId);
         break;
     }
+  })
+  .onDone(function (error, r) {
+    if (error) {
+       console && console.error(error);
+    }
+    subscribedRoom = r;
   });
 
   return room;
