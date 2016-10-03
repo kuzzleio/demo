@@ -43,7 +43,7 @@ In your html, you can then include it.
 ```html
 101.html --
   [..]
-  <script src="bower_components/kuzzle-sdk/dist/kuzzle.min.js"></script>
+  <script src="bower_components/kuzzle-sdk/dist/kuzzle.js"></script>
   <script src="config.js"></script>
   <script src="js/app.101.js"></script>
   <script>
@@ -63,7 +63,11 @@ js/app.101.js --
 angular.module('KuzzleChatDemo', [])
   // setup kuzzle as an Angular service
   .factory('kuzzle', function () {
-    return new Kuzzle(config.kuzzleUrl, {defaultIndex: config.appIndex});
+    return new Kuzzle(config.kuzzleUrl, {
+      defaultIndex: config.appIndex,
+      ioPort: 7512,
+      wsPort: 7513
+    });
   })
   [..]
 ```
@@ -145,8 +149,10 @@ Finally, our constructor automatically subscribes to Kuzzle.
 ```javascript
 ChatRoom.prototype.subscribe = function () {
   var self = this;
+  
+  this.subscribed = true;
 
-  this.kuzzleSubscription = kuzzleMessagesCollection
+  kuzzleMessagesCollection
     .subscribe(
       {term: {chatRoom: self.id}},
       function (err, response) {
@@ -157,8 +163,13 @@ ChatRoom.prototype.subscribe = function () {
         });
         $rootScope.$apply();
       }
-    );
-  this.subscribed = true;
+    )
+    .onDone(function (err, room) {
+      if (err) {
+        return console.error(err);
+      }
+      self.kuzzleSubscription = room;
+    });
 };
 ```
 
