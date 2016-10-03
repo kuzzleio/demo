@@ -51,23 +51,27 @@ Poker.planning.homePage = {
                     type: "ROOM"
                 }
             };
-            Poker.planning.pokerPage.roomIdSubscription = Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).subscribe(subscriptionFilters, function(error, response) {
-                if(error) {
-                    console.error("Error in homePage.run() function when subscribing to room update.")
-                    console.error(error);
-                }
-                else {
-                    if(response.action == "delete") {
-                        Poker.planning.RoomManager.removeRoomFromList(response.result._id);
-                    }
-                    else {
-                        Poker.planning.RoomManager.updateOrCreateRoom(response);
-                    }
-                    Poker.planning.homePage.displayRooms();
-                }
 
-            });
-
+            Poker.planning.kuzzle
+              .dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION)
+              .subscribe(subscriptionFilters, function (error, response) {
+                  if(error && console) {
+                      console.error("Error in homePage.run() function when subscribing to room update.")
+                      console.error(error);
+                  }
+                  else {
+                      if(response.action == "delete") {
+                          Poker.planning.RoomManager.removeRoomFromList(response.result._id);
+                      }
+                      else {
+                          Poker.planning.RoomManager.updateOrCreateRoom(response);
+                      }
+                      Poker.planning.homePage.displayRooms();
+                  }
+              })
+              .onDone(function (error, room) {
+                 Poker.planning.pokerPage.roomIdSubscription = room;
+              });
         });
 
     },

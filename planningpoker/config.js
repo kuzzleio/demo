@@ -1,4 +1,4 @@
 var config = {
-  kuzzleUrl: 'http://localhost:7512',
+  kuzzleUrl: window.location.host,
   index: "planning-poker"
 };
