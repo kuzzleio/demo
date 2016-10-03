@@ -1,5 +1,10 @@
-var kuzzle = new Kuzzle(config.kuzzleUrl, {defaultIndex: config.index});
+var kuzzle = new Kuzzle(config.kuzzleUrl, {
+  defaultIndex: config.index,
+  ioPort: 7512,
+  wsPort: 7513
+});
 var kuzzleChannel = "chooseyourday";
+
 var chooseYourDay = angular.module("chooseyourday", [
   "ngRoute",
   "ui.bootstrap.datetimepicker"
@@ -30,38 +35,46 @@ chooseYourDay.controller("ListEventController", ["$scope", "$location", function
     $scope.getAllEvents();
     moment.locale('en');
 
-    $scope.room = kuzzle.dataCollectionFactory(kuzzleChannel).subscribe({"term": {type: "chooseyourday_event"}}, function (error, response) {
+    kuzzle
+      .dataCollectionFactory(kuzzleChannel)
+      .subscribe({"term": {type: "chooseyourday_event"}}, function (error, response) {
+        if (error) {
+          console && console.error(error);
+          return false;
+        }
 
-      if (error) {
-        console.error(error);
-        return false;
-      }
+        if (response.action === "create") {
+          $scope.addToList(response.result._id, response.result._source);
+        }
 
-      if (response.action === "create") {
-        $scope.addToList(response.result._id, response.result._source);
-      }
+        if (response.action === "delete") {
+          $scope.events.some(function (event, index) {
+                                                       if (event._id === response.result._id) {
+                                                       $scope.events.splice(index, 1);
+                                                       return true;
+                                                       }
+                                                       });
+        }
 
-      if (response.action === "delete") {
-        $scope.events.some(function (event, index) {
-          if (event._id === response.result._id) {
-            $scope.events.splice(index, 1);
-            return true;
-          }
-        });
-      }
+        if (response.action === "update") {
+          $scope.events.some(function (event, index) {
+                                                       if (event._id === response.result._id) {
+                                                       $scope.events[index].name = response.result._source.name;
+                                                       $scope.events[index].dates = response.result._source.dates;
+                                                       return true;
+                                                       }
+                                                       });
+        }
 
-      if (response.action === "update") {
-        $scope.events.some(function (event, index) {
-          if (event._id === response.result._id) {
-            $scope.events[index].name = response.result._source.name;
-            $scope.events[index].dates = response.result._source.dates;
-            return true;
-          }
-        });
-      }
+        $scope.$apply();
+      })
+      .onDone(function(error, room) {
+        if (error && console) {
+          return console.error(error);
+        }
 
-      $scope.$apply();
-    });
+        $scope.room = room;
+      });
   };
 
   $scope.$on("$destroy", function () {
@@ -281,37 +294,46 @@ chooseYourDay.controller("EventController", ["$scope", "$location", "$routeParam
       ]
     };
 
-    $scope.room = kuzzle.dataCollectionFactory(kuzzleChannel).subscribe(terms, function (error, response) {
-      if (error) {
-        console.error(error);
-        return false;
-      }
+    kuzzle
+      .dataCollectionFactory(kuzzleChannel)
+      .subscribe(terms, function (error, response) {
+        if (error) {
+          console && console.error(error);
+          return false;
+        }
 
-      if (response.action === "create") {
-        $scope.addToParticipants(response.result._id, response.result._source);
-      }
+        if (response.action === "create") {
+          $scope.addToParticipants(response.result._id, response.result._source);
+        }
 
-      if (response.action === "delete") {
-        $scope.participants.some(function (participant, index) {
-          if (participant._id === response.result._id) {
-            $scope.participants.splice(index, 1);
-            return true;
-          }
-        });
-      }
+        if (response.action === "delete") {
+          $scope.participants.some(function (participant, index) {
+                                                                   if (participant._id === response.result._id) {
+                                                                   $scope.participants.splice(index, 1);
+                                                                   return true;
+                                                                   }
+                                                                   });
+        }
 
-      if (response.action === "update") {
-        $scope.participants.some(function (participant, index) {
-          if (participant._id === response._id) {
-            $scope.participants[index].name = response._source.name;
-            $scope.participants[index].answers = response._source.answers;
-            return true;
-          }
-        });
-      }
+        if (response.action === "update") {
+          $scope.participants.some(function (participant, index) {
+                                                                   if (participant._id === response._id) {
+                                                                   $scope.participants[index].name = response._source.name;
+                                                                   $scope.participants[index].answers = response._source.answers;
+                                                                   return true;
+                                                                   }
+                                                                   });
+        }
 
-      $scope.$apply();
-    });
+        $scope.$apply();
+      })
+      .onDone(function (error, room) {
+        if (error && console) {
+          return console.error(error);
+        }
+
+        $scope.room = room;
+      });
   };
 
   $scope.$on("$destroy", function () {
