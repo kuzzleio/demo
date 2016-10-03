@@ -1,0 +1,8 @@
+{
+  "apps": [{
+    "name": "kuzzle",
+    "cwd": "/var/app",
+    "script": "bin/kuzzle",
+    "args": "start --fixtures /fixtures.json"
+  }]
+}

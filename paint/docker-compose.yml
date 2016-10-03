@@ -1,32 +1,49 @@
-demo:
-  image: nginx
-  volumes:
-    - ".:/usr/share/nginx/html"
-  links:
-    - kuzzle
-  ports:
-    - "80:80"
+version: '2'
 
-proxy:
-  image: kuzzleio/proxy:alpine
-  ports:
-    - "7511:7511"
-    - "7512:7512"
+services:
+  bootstrap:
+    image: node:4
+    working_dir: /var/app
+    command: sh -c 'npm install -g bower && bower install --allow-root'
+    volumes:
+      - ".:/var/app"
 
-kuzzle:
-  image: kuzzleio/kuzzle:1.0.0-RC4
-  volumes:
-    - "./fixtures.json:/fixtures.json"
-  links:
-    - elasticsearch
-    - redis
-    - proxy:api
-  environment:
-    - LIKE_A_VIRGIN=1
+  demo:
+    image: nginx
+    volumes:
+      - ".:/usr/share/nginx/html"
+    links:
+      - kuzzle
+    ports:
+      - "80:80"
 
-redis:
-  image: redis:3.0-alpine
+  proxy:
+    image: kuzzleio/proxy:1.0.0-RC5
+    networks:
+      paint:
+        aliases:
+          - api
+    ports:
+      - "7511-7513:7511-7513"
 
-elasticsearch:
-  image: elasticsearch:2.2
-  command: elasticsearch --cluster.name=paint
+  kuzzle:
+    image: kuzzleio/kuzzle:1.0.0-RC6
+    networks:
+      - paint
+    volumes:
+      - "./fixtures.json:/fixtures.json"
+      - "./pm2.json:/config/pm2.json"
+
+  redis:
+    image: redis:3.2-alpine
+    networks:
+      - paint
+
+  elasticsearch:
+    image: elasticsearch:2.4
+    networks:
+      - paint
+    command: elasticsearch --cluster.name=paint
+
+networks:
+  paint:
