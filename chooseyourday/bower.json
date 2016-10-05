@@ -14,7 +14,7 @@
     "bower_components"
   ],
   "dependencies": {
-    "kuzzle-sdk": "1.9.2",
+    "kuzzle-sdk": "2.1.4",
     "jquery": "1.11.3",
     "angular": "~1.4.1",
     "bootstrap": "~3.1.1",
