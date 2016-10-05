@@ -1,32 +1,51 @@
-demo:
-  image: nginx
-  volumes:
-    - ".:/usr/share/nginx/html"
-  ports:
-    - "80:80"
+version: '2'
 
-server:
-  image: node:4.1.1
-  command: sh -c "cd /var/app/server && npm start"
-  volumes:
-    - ".:/var/app/server"
+services:
+  demo:
+    image: nginx
+    networks:
+      - tournament
+    volumes:
+      - ".:/usr/share/nginx/html"
+    ports:
+      - "80:80"
+    environment:
+      - KUZZLE_HOST
 
-proxy:
-  image: kuzzleio/proxy:alpine
-  ports:
-    - "7511:7511"
-    - "7512:7512"
-    
-kuzzle:
-  image: kuzzleio/kuzzle:1.0.0-RC4
-  links:
-    - elasticsearch
-    - redis
-    - proxy:api
+  server:
+    image: node:4.1.1
+    depends_on:
+      - proxy
+    networks:
+      - tournament
+    command: sh -c "cd /var/app && npm start"
+    volumes:
+      - ".:/var/app"
 
-redis:
-  image: redis:3.0-alpine
+  proxy:
+    image: kuzzleio/proxy:1.0.0-RC5
+    networks:
+      tournament:
+        aliases:
+          - api
+    ports:
+      - "7511-7513:7511-7513"
 
-elasticsearch:
-  image: elasticsearch:2.2
-  command: elasticsearch --cluster.name=tournament
+  kuzzle:
+    image: kuzzleio/kuzzle:1.0.0-RC6
+    networks:
+      - tournament
+
+  redis:
+    image: redis:3.2-alpine
+    networks:
+      - tournament
+
+  elasticsearch:
+    image: elasticsearch:2.3
+    networks:
+      - tournament
+    command: elasticsearch --cluster.name=tournament
+
+networks:
+  tournament:
