@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "angular-scroll-glue": "~2.0.6",
-    "kuzzle-sdk": "1.9.2",
+    "kuzzle-sdk": "2.1.4",
     "angular": "~1.4.7",
     "foundation": "~5.5.3",
     "jquery": "2.2.1"

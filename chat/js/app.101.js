@@ -1,7 +1,11 @@
 angular.module('KuzzleChatDemo', ['luegg.directives'])
   // setup kuzzle as an Angular service
   .factory('kuzzle', function () {
-    return new Kuzzle(config.kuzzleUrl, {defaultIndex: config.appIndex});
+    return new Kuzzle(config.kuzzleUrl, {
+      defaultIndex: config.appIndex,
+      ioPort: 7512,
+      wsPort: 7513
+    });
   })
   // KuzzleDataCollection on which the messages are submited
   .factory('kuzzleMessagesCollection', ['kuzzle', function (kuzzle) {
@@ -33,7 +37,9 @@ angular.module('KuzzleChatDemo', ['luegg.directives'])
     ChatRoom.prototype.subscribe = function () {
       var self = this;
 
-      this.kuzzleSubscription = kuzzleMessagesCollection
+      this.subscribed = true;
+
+      kuzzleMessagesCollection
         .subscribe(
           {term: {chatRoom: self.id}},
           function (err, response) {
@@ -44,8 +50,15 @@ angular.module('KuzzleChatDemo', ['luegg.directives'])
             });
             $rootScope.$apply();
           }
-        );
-      this.subscribed = true;
+        )
+        .onDone(function (err, room) {
+          if (err) {
+            console && console.error(err);
+            return;
+          }
+
+          self.kuzzleSubscription = room;
+        });
     };
 
     /**

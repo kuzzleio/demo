@@ -164,7 +164,7 @@ The constructor then retrieves all the available rooms from Kuzzle by calling it
  */
 ChatRoomList.prototype.subscribe = function () {
   var self = this;
-
+  
   kuzzleChatRoomListCollection
     .subscribe(
       {},
