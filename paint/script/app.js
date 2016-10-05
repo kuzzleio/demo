@@ -128,7 +128,12 @@ function PaintChannel (config) {
       query = {term: {type: 'lines'}},
       clearFilters = {term: {type: 'clear'}};
 
-    kuzzle = new Kuzzle(config.kuzzleUrl, {defaultIndex: config.appIndex, autoReconnect: true});
+    kuzzle = new Kuzzle(config.kuzzleUrl, {
+      defaultIndex: config.appIndex,
+      autoReconnect: true,
+      ioPort: 7511,
+      wsPort: 7513
+    });
     paintCollection = kuzzle.dataCollectionFactory('paint');
 
     var newLineNotif = function (error, response) {

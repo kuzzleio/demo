@@ -6,6 +6,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "kuzzle-sdk": "1.9.2"
+    "kuzzle-sdk": "2.1.4"
   }
 }
