@@ -1,28 +1,47 @@
-demo:
-  image: nginx
-  volumes:
-    - ".:/usr/share/nginx/html"
-  ports:
-    - "80:80"
+version: '2'
 
-proxy:
-  image: kuzzleio/proxy:alpine
-  ports:
-    - "7511:7511"
-    - "7512:7512"
+services:
+  bootstrap:
+    image: node:6
+    command: sh -c 'cd /var/app; npm install -g bower; bower install --allow-root'
+    volumes:
+      - ".:/var/app"
 
-kuzzle:
-  image: kuzzleio/kuzzle:1.0.0-RC4
-  links:
-    - elasticsearch
-    - redis
-    - proxy:api
-  environment:
-    - LIKE_A_VIRGIN=1
+  demo:
+    image: nginx
+    networks:
+      - arrowhero
+    volumes:
+      - ".:/usr/share/nginx/html"
+    ports:
+      - "80:80"
 
-redis:
-  image: redis:3.0-alpine
+  proxy:
+    image: kuzzleio/proxy:1.0.0-RC5
+    networks:
+      arrowhero:
+        aliases:
+          - api
+    ports:
+      - "7511-7513:7511-7513"
 
-elasticsearch:
-  image: elasticsearch:2.2
-  command: elasticsearch --cluster.name=arrow
+  kuzzle:
+    image: kuzzleio/kuzzle:1.0.0-RC6
+    networks:
+      - arrowhero
+    environment:
+      - LIKE_A_VIRGIN=1
+
+  redis:
+    image: redis:3.2-alpine
+    networks:
+      - arrowhero
+
+  elasticsearch:
+    image: elasticsearch:2.4
+    networks:
+      - arrowhero
+    command: elasticsearch --cluster.name=arrow
+
+networks:
+  arrowhero:

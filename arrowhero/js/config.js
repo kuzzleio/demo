@@ -1,4 +1,5 @@
 var config = {
-  kuzzleUrl: 'http://localhost:7512',
+  kuzzleUrl: window.location.host,
   mainRoom: 'kg_main_room'
 };
+

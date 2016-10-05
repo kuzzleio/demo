@@ -18,15 +18,19 @@
 
   initServer: function(cb) {
     if (!this.kuzzle) { // if it has not be done yet...
-      this.kuzzle = new Kuzzle(this.server, {defaultIndex: this.mainIndex}, cb);
+      this.kuzzle = new Kuzzle(this.server, {
+        defaultIndex: this.mainIndex,
+        ioPort: 7512,
+        wsPort: 7513
+      }, cb);
     }
   },
 
   init: function(kuzzleGame) {
 
-    this.initServer((err, res) => {
+    this.initServer(function (err) {
       if (err) {
-        console.error('Cannot connect to Kuzzle instance: ', err);
+        console && console.error('Cannot connect to Kuzzle instance: ', err);
         return false;
       }
 
@@ -36,7 +40,7 @@
 
       this.kuzzleGame = kuzzleGame;
       this.findHost(); // go to find host
-    });
+    }.bind(this));
 
   },
 
@@ -54,23 +58,25 @@
       }
     };
 
-    KuzzleGame.KuzzleManager.kuzzle.dataCollectionFactory(this.mainRoom).advancedSearch(filters, (error, response) => {
-      if (error) {
-        console.error(error);
-      }
+    KuzzleGame.KuzzleManager.kuzzle
+      .dataCollectionFactory(this.mainRoom)
+      .advancedSearch(filters, function (error, response) {
+        if (error) {
+          console && console.error(error);
+        }
 
-      if (error || response.total == 0) {
-        KuzzleGame.KuzzleManager.log('no host found');
-        KuzzleGame.KuzzleManager.registerAsHost();
+        if (error || response.total == 0) {
+          KuzzleGame.KuzzleManager.log('no host found');
+          KuzzleGame.KuzzleManager.registerAsHost();
 
-      } else {
-        KuzzleGame.KuzzleManager.log('host found');
-        KuzzleGame.KuzzleManager.hostID = response.documents[0].content.hostID;
-        KuzzleGame.KuzzleManager.log(response.documents[0]);
-        KuzzleGame.KuzzleManager.subscribeToHost();
-        KuzzleGame.KuzzleManager.checkConnexion();
-      }
-    });
+        } else {
+          KuzzleGame.KuzzleManager.log('host found');
+          KuzzleGame.KuzzleManager.hostID = response.documents[0].content.hostID;
+          KuzzleGame.KuzzleManager.log(response.documents[0]);
+          KuzzleGame.KuzzleManager.subscribeToHost();
+          KuzzleGame.KuzzleManager.checkConnexion();
+        }
+      }.bind(this));
   },
 
   /**
@@ -85,9 +91,9 @@
     this.kuzzle.dataCollectionFactory("kg_main_room").createDocument({
       hostID: this.uniquid,
       hostDifficulty: KuzzleGame.Difficulty.currentDifficulty
-    }, function(error, response) {
+    }, function(error) {
       if (error) {
-        console.error(error);
+        console && console.error(error);
       } else {
 
         KuzzleGame.KuzzleManager.hostID = KuzzleGame.KuzzleManager.uniquid;
@@ -132,29 +138,30 @@
     if (typeof(clearHostId) === 'undefined') clearHostId = true;
 
 
-    this.kuzzle.dataCollectionFactory(this.mainRoom).deleteDocument(filters, (error, response) => {
-
-      if (error) {
-        console.error(error);
-      }
-
-      KuzzleGame.KuzzleManager.log("unloadind host");
-      KuzzleGame.KuzzleManager.log(response);
-
-      KuzzleGame.KuzzleManager.registeredOnMainRoom = false;
-
-      if (callbackFunc != 'undefined' && callbackFunc != null) {
-        if (this.debug) {
-          console.log(callbackFunc);
+    this.kuzzle
+      .dataCollectionFactory(this.mainRoom)
+      .deleteDocument(filters, function (error, response) {
+        if (error) {
+          console && console.error(error);
         }
-        callbackFunc();
-      }
 
-      if (clearHostId) {
-        KuzzleGame.KuzzleManager.hostID = false;
-      }
+        KuzzleGame.KuzzleManager.log("unloadind host");
+        KuzzleGame.KuzzleManager.log(response);
 
-    });
+        KuzzleGame.KuzzleManager.registeredOnMainRoom = false;
+
+        if (callbackFunc != 'undefined' && callbackFunc != null) {
+          if (this.debug) {
+            console && console.log(callbackFunc);
+          }
+          callbackFunc();
+        }
+
+        if (clearHostId) {
+          KuzzleGame.KuzzleManager.hostID = false;
+        }
+
+      }.bind(this));
 
   },
 
@@ -163,15 +170,17 @@
    */
   createHostSubChannel: function() {
     if (this.hostID) {
-      this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).createDocument({
-        hostID: this.hostID
-      }, (error, response) => {
-        if (error) {
-          console.error(error);
-        } else {
-          KuzzleGame.KuzzleManager.subscribeToHost();
-        }
-      });
+      this.kuzzle
+        .dataCollectionFactory("kg_room_" + this.hostID)
+        .createDocument({
+            hostID: this.hostID
+          }, function (error) {
+            if (error) {
+              console && console.error(error);
+            } else {
+              KuzzleGame.KuzzleManager.subscribeToHost();
+            }
+          });
     }
   },
 
@@ -190,13 +199,14 @@
       }
     };
 
-    this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).deleteDocument(filters, (error, response) => {
-      if (error) {
-        console.error(error);
-      }
-      KuzzleGame.KuzzleManager.log(response);
-
-    });
+    this.kuzzle
+      .dataCollectionFactory("kg_room_" + this.hostID)
+      .deleteDocument(filters, function (error, response) {
+        if (error) {
+          console && console.error(error);
+        }
+        KuzzleGame.KuzzleManager.log(response);
+      });
   },
 
   /**
@@ -214,7 +224,11 @@
       }
     };
 
-    this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID).subscribe(filters, this.fireEvent);
+    this.kuzzle.dataCollectionFactory("kg_room_" + this.hostID)
+      .subscribe(filters, this.fireEvent)
+      .onDone(function(err, response) {
+        console && console.log(err, response);
+      });
 
   },
 
@@ -239,7 +253,6 @@
     }
 
     if (KuzzleGame.KuzzleManager.peering == response.result._source.event_owner) {
-
       window["KuzzleGame"]["KuzzleManager"][eventFunctionName](response.result._source.event_value);
     }
 
@@ -257,11 +270,11 @@
       event_type: eventType,
       event_value: value,
       event_owner: KuzzleGame.KuzzleManager.uniquid
-    }, (error, response) => {
+    }, function (error) {
       if (error) {
-        console.error(error);
+        console && console.error(error);
       }
-    });
+    }.bind(this));
   },
 
 
