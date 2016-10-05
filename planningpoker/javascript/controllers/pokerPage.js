@@ -156,28 +156,36 @@ Poker.planning.pokerPage = {
                 }
             };
 
-            Poker.planning.pokerPage.roomIdSubscription = Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION).subscribe(subscriptionFilters, function(error, response) {
-                if(error) {
-                    console.error("Error in pokerPage.run() function when subscribing to room update.");
-                    console.error(error);
-                }
-                else {
-                    if (response.action == "delete") {
-                        Poker.planning.pokerPage.unsubscribe();
-                        alert("The session has been deleted.");
-                        Poker.planning.homePage.redirectToThisPage();
-                    }
-                    else {
-                        Poker.planning.RoomManager.currentRoom().refresh(response.result._id, response.result._source);
-                        Poker.planning.pokerPage.display();
-                    }
-                }
-
-            });
-
+            Poker.planning.kuzzle
+              .dataCollectionFactory(Poker.planning.RoomManager.KUZZLE_ROOM_COLLECTION)
+              .subscribe(subscriptionFilters, function (error, response) {
+                  if(error && console) {
+                      console.error("Error in pokerPage.run() function when subscribing to room update.");
+                      console.error(error);
+                  }
+                  else {
+                      if (response.action == "delete") {
+                          Poker.planning.pokerPage.unsubscribe();
+                          alert("The session has been deleted.");
+                          Poker.planning.homePage.redirectToThisPage();
+                      }
+                      else {
+                          Poker.planning.RoomManager.currentRoom().refresh(response.result._id, response.result._source);
+                          Poker.planning.pokerPage.display();
+                      }
+                  }
+              })
+              .onDone(function (error, room) {
+                  if (error && console) {
+                      return console.error(error);
+                  }
+                  Poker.planning.pokerPage.roomIdSubscription = room;
+              });
 
             // Subscribes to poker actions
-            Poker.planning.pokerPage.actionSubscription = Poker.planning.kuzzle.dataCollectionFactory(Poker.planning.pokerPage.KUZZLE_POKER_ACTION_COLLECTION).subscribe({term: {roomid: Poker.planning.RoomManager.currentRoom().id()}}, function(error, response) {
+            Poker.planning.pokerPage.actionSubscription = Poker.planning.kuzzle
+              .dataCollectionFactory(Poker.planning.pokerPage.KUZZLE_POKER_ACTION_COLLECTION)
+              .subscribe({term: {roomid: Poker.planning.RoomManager.currentRoom().id()}}, function(error, response) {
                 if(error) {
                     console.error(error);
                 }
@@ -197,8 +205,13 @@ Poker.planning.pokerPage = {
                             console.error("undefined poker action", body);
                             break;
                     }
-                }
-            });
+                }})
+              .onDone(function (error, room) {
+                 if (error && console) {
+                     return console.error(error);
+                 }
+                 Poker.planning.pokerPage.actionSubscription = room;
+              });
 
             Poker.planning.pokerPage.display();
         });

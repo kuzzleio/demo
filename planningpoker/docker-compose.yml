@@ -1,33 +1,49 @@
-demo:
-  image: nginx
-  volumes:
-    - ".:/usr/share/nginx/html"
-  links:
-    - kuzzle
-  ports:
-    - "80:80"
+version: '2'
 
-proxy:
-  image: kuzzleio/proxy:alpine
-  ports:
-    - "7511:7511"
-    - "7512:7512"
-    
-kuzzle:
-  image: kuzzleio/kuzzle:1.0.0-RC4
-  volumes:
-    - "./defaultMapping.json:/defaultMapping.json"
-  links:
-    - elasticsearch
-    - redis
-    - proxy:api
-  environment:
-    - LIKE_A_VIRGIN=1
-    - DEFAULT_MAPPING=/defaultMapping.json
+services:
+  bootstrap:
+    image: node:4
+    working_dir: /var/app
+    command: sh -c 'npm install -g bower && bower install --allow-root'
+    volumes:
+      - ".:/var/app"
 
-redis:
-  image: redis:3.0-alpine
+  demo:
+    image: nginx
+    volumes:
+      - ".:/usr/share/nginx/html"
+    ports:
+      - "80:80"
 
-elasticsearch:
-  image: elasticsearch:2.2
-  command: elasticsearch --cluster.name=planningpoker
+  proxy:
+    image: kuzzleio/proxy:1.0.0-RC5
+    networks:
+      kuzzle:
+        aliases:
+          - api
+    ports:
+      - "7511-7513:7511-7513"
+
+  kuzzle:
+    image: kuzzleio/kuzzle:1.0.0-RC6
+    networks:
+      - kuzzle
+    volumes:
+      - "./defaultMapping.json:/defaultMapping.json"
+    environment:
+      - LIKE_A_VIRGIN=1
+      - DEFAULT_MAPPING=/defaultMapping.json
+
+  redis:
+    image: redis:3.2-alpine
+    networks:
+      - kuzzle
+
+  elasticsearch:
+    image: elasticsearch:2.4
+    networks:
+      - kuzzle
+    command: elasticsearch --cluster.name=planningpoker
+
+networks:
+  kuzzle:

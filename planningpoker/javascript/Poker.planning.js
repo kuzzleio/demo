@@ -25,7 +25,11 @@ Poker.planning = {
      */
     run: function() {
 
-        this.kuzzle = new Kuzzle(config.kuzzleUrl, {defaultIndex: config.index});
+        this.kuzzle = new Kuzzle(config.kuzzleUrl, {
+            defaultIndex: config.index,
+            ioPort: 7512,
+            wsPort: 7513
+        });
 
         // activating bootstrap tooltips
         $('[data-toggle="tooltip"]').tooltip();
