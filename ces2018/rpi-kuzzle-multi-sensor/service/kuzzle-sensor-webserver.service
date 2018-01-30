@@ -1,0 +1,14 @@
+[Unit]
+Description=Kuzzle Sensor Webserver
+After=network-online.target
+Wants=network-online.target runlevel3.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/kuzzle/kuzzle-sensor
+ExecStart=/usr/bin/python3 -m webserver
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

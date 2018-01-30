@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Kuzzle MSensor</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="css/bootstrap.css" crossorigin="anonymous">
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script>
+    $(function() {
+      console.log("hello");
+      $('#navbar').load("navbar.html", () => document.getElementById('menu_admin').className = "item nav-link active")
+    })
+  </script>
+</head>
+
+<body class="justify-content-center">
+
+  <div id="navbar"></div>
+
+  <div class="container">
+
+    <br>
+    <h3>Administration</h3>
+    <hr class="my-4">
+      <div class="card mx-auto" style="width: 30rem;">
+        <div class="card-header">
+          Kuzzle
+        </div>
+        <div class="card-body">
+          <form action="/setup" method="post">
+            <div class="input-group">
+              <label class="input-group-addon" for="kuzzleHost" style="width: 8rem;">Hostname or ip</label>
+              <input type="text" class="form-control" id="kuzzlehost" name="khost" value="${config.kuzzle.host}" placeholder="hostname or ip address " onchange="validate_kuzzle_host()">
+            </div>
+            </br>
+            <div class="input-group ">
+              <label class="input-group-addon " for="kuzzlePort " style="width: 8rem; ">port</label>
+              <input type="text " class="form-control " id="kuzzleport" name="kport" value="${config.kuzzle.port}" placeholder="kuzzle port" oninput="validate_kuzzle_port()" onblur="input_blur()">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+      </div>
+      <br>
+      <div class="card mx-auto" style="width: 30rem;">
+        <div class="card-header">
+          Device settings
+        </div>
+        <div class="card-body">
+          <form action="/setup" method="post">
+            <div class="input-group">
+              <label class="input-group-addon" for="kuzzleHost" style="width: 10rem;">Owner</label>
+              <input type="text" class="form-control" id="kuzzlehost" name="owner" value="${config.device.owner}" placeholder="owner of the device">
+            </div>
+            </br>
+            <div class="input-group ">
+              <label class="input-group-addon " for="kuzzlePort " style="width: 10rem; ">RGB light led count</label>
+              <input type="text " class="form-control " id="kuzzleport" name="led_counts" value="${config.device.rgb_light.led_count}" placeholder="" oninput="" onblur="">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+      </div>
+    <br>
+    <h3>Tools</h3>
+    <hr class="my-4">
+    <div class="card mx-auto" style="width: 30rem;">
+      <div class="card-header">
+        Kuzzle sanity check
+      </div>
+      <div class="card-body">
+        <div class="card-text" id='testresult'>
+          Press <strong>Check</strong> button to start validation
+        </div>
+        </br>
+        <button type="button" onclick="kuzzleSanityCheck()" class="btn btn-primary btn-sm float-right">Check</button>
+        </form>
+      </div>
+    </div>
+    <br>
+    <!-- <div class="card mx-auto" style="width: 30rem;">
+      <div class="card-header">
+        Deploit IoT framework to Kuzzle.
+      </div>
+      <div class="card-body">
+        <form action="/deploy_iot" method="post">
+          <div class="card-text">
+            This will create an IoT index and create the necessary collections with mappings to allow running Kuzzle demo sensors.
+          </div>
+          <button type="submit" class="btn btn-primary">Deploy</button>
+        </form>
+      </div>
+    </div>
+    </br>
+    </hr>
+    <div></div>
+  </div> -->
+    <script src="js/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="js/bluebird.min.js"></script>
+    <script src="js/kuzzle.js"></script>
+    <style>
+      .alert {
+        margin-bottom: 5px;
+        padding: 5px 15px;
+      }
+
+      .img-success {
+        content: url(./icons/glyphicons-199-ok-circle-white.png);
+      }
+
+      .img-danger {
+        content: url(./icons/glyphicons-198-remove-circle.png);
+      }
+
+      .img-small {
+        width: 15px;
+        height: 15px;
+      }
+    </style>
+    <script type="text/javascript">
+      function input_blur() {
+        $("#kuzzleport").removeClass("is-valid")
+
+
+      }
+
+      function validate_kuzzle_port() {
+        var patt = /^\s*\d+\s*$/
+
+        port = $("#kuzzleport").val()
+
+        console.log('port = ', port);
+        if (patt.test(port)) {
+          console.log("port is valid");
+          $("#kuzzleport").addClass("is-valid").removeClass("is-invalid")
+
+        } else {
+          $("#kuzzleport").addClass("is-invalid").removeClass("is-valid")
+          console.error("Port is invalid");
+        }
+      }
+
+      function kuzzleSanityCheck() {
+        testresult = $('#testresult')[0]
+        kuzzlehost = $('#kuzzlehost').val()
+        kuzzleport = $('#kuzzleport').val()
+
+        testresult.innerHTML = `<div class="alert alert-info" role="alert">Connecting to Kuzzle: <strong class="float-right">${kuzzlehost}:${kuzzleport}</strong></div>`
+        kuzzle = new Kuzzle(kuzzlehost, {
+            port: kuzzleport,
+            autoReconnect: false
+          },
+          (err, res) => {
+            console.log("Connection callback");
+            if (err) {
+              console.log('Connection error:', err)
+              testresult.innerHTML += `<div class="alert alert-danger" role="alert"><strong>Connection to Kuzzle:</strong><span class="badge badge-danger float-right mt-1">Failed</span>
+                <hr><p class="mb-0"> ${err.message}</p></div>`
+            } else {
+              testresult.innerHTML += `<div class="alert alert-success" role="alert">Connection to Kuzzle<span class="badge badge-success float-right mt-1">OK</span></div>`
+
+              var indexes = new Promise((resolve, reject) => {
+                kuzzle.listIndexes((err, indexes) => {
+                  if (err) {
+                    console.log("listIndexes error");
+                    reject(err)
+                  } else {
+                    console.log("indexes ok:", indexes);
+                    resolve(indexes)
+                  }
+                })
+              })
+
+              indexes
+                .then(indexes => {
+                  if (indexes.indexOf("iot") != -1) {
+                    testresult.innerHTML += `<div class="alert alert-success" role="alert"><strong>iot</strong> index<span class="badge badge-success mx-auto p0 float-right mt-1">OK</span></div>`
+                    return new Promise((resolve, reject) => {
+                      kuzzle.listCollections('iot', (err, collections) => {
+                        if (err) {
+                          reject(err)
+                        } else {
+                          resolve(collections)
+                        }
+                      })
+                    })
+                  } else {
+                    testresult.innerHTML +=
+                      `<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>iot</strong> index not fround</h4><p>You Kuzzle instence should have an <strong>iot</strong> index</p></hr><p>Please use setup tool to setup your environment</p></div>`
+                  }
+                })
+                .catch(err => {
+                  testresult.innerHTML += `<div class="alert alert-danger" role="alert">Failled to retreive indexes</div>`
+                })
+                .then((iot_collections) => {
+                  console.log("'iot' collections: ", iot_collections);
+                  var iot_col = ["device-state", "device-info", "fw-updates", ]
+                  iot_col.forEach(col => {
+                    if (!iot_collections.find((e, i) => e.name === col))
+                      testresult.innerHTML += `<div class="alert alert-danger" id="col_result" role="alert">
+                      Missing collection <strong>${col}</strong>
+                      </div>`
+                    else
+                      testresult.innerHTML +=
+                      `<div class="alert alert-success" id="col_result" role="alert">
+                    Collection <strong>${col}</strong><span class="badge badge-success float-right mt-1">OK</span>
+                      </div>`
+
+                  })
+                })
+                .catch(err => {
+                  testresult.innerHTML +=
+                    `<div class="alert alert-danger" role="alert">Failled to retreive 'iot' collections <span class="badge badge-danger float-right mt-1">Failled</span>
+                <hr>
+                ${err}
+                </div>`
+                })
+            }
+          })
+      }
+    </script>
+</body>
+
+</html>

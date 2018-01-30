@@ -1,0 +1,13 @@
+[Unit]
+Description=Kuzzle Sensor Firmware
+After=network-online.target
+Wants=network-online.target runlevel3.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/kuzzle/kuzzle-sensor
+ExecStart=/usr/bin/python3 firmware.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

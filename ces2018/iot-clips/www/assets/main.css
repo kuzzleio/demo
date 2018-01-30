@@ -1,0 +1,82 @@
+
+body {
+    background-image:url(/assets/galaxy.jpg);
+    color:white;
+    font-family: 'Proxima Nova', Georgia, sans-serif;
+}
+
+/*---- HEADER ----*/
+
+header  {
+    height:233px;
+    
+}
+
+    div#logo {
+        margin-top:20px;
+        text-align: center;
+
+    }
+
+
+    header ul {
+        width:38%;
+        float:left;
+        margin:1%;
+    }
+
+    header ul li {
+        display:inline-block;
+        background-color: white;
+        color:black;
+        padding:5px;
+        margin:5px;
+        font-size: 1.5em;
+    }
+
+    div#subtitle {
+        float:left;
+        text-align: center;
+        font-size:1.7em;
+        width:20%;
+        padding-top:25px;
+    }
+
+/*---- MAIN ----*/
+
+main {
+    width:100%;
+}
+
+#video {
+    width:1080px;
+    margin: 0 auto 0 auto;
+}
+
+#video ul {
+    float:left;
+    position:absolute;
+    left:950px;
+}
+
+#video li {
+    margin:5px;
+    padding:5px;
+    font-size: 1.2em;
+    color:black;
+    background-color: rgba(38, 179, 10, 0.8);  
+}
+
+
+
+
+/*---- Remote ----*/
+
+#remote i {
+    font-size:3em;
+    display:block;
+    text-align: center;
+    margin:15px;
+}
+
+

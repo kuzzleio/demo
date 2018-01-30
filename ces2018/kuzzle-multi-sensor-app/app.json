@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "sdkVersion": "22.0.0",
+    "slug": "MyFirstReacNativeApp",
+    "name": "MyFirstReacNativeApp"
+  },
+  "name": "MyFirstReacNativeApp",
+  "displayName": "MyFirstReacNativeApp"
+}

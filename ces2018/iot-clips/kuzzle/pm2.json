@@ -1,0 +1,7 @@
+{
+    "apps": [{
+      "name": "kuzzle",
+      "script": "bin/kuzzle",
+      "args": "start --fixtures /fixtures.json --mappings /mapping.json"
+    }]
+  }

@@ -1,0 +1,697 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Kuzzle MSensor</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="css/bootstrap.min.css" crossorigin="anonymous">
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script defer src="js/fontawesome-all.js"></script>
+
+
+  <script>
+    $(function() {
+      $('#navbar').load(
+        "navbar.html",
+        () => document.getElementById('menu_dashboard').className = "item nav-link active"
+      )
+
+      document.getElementById("light-color-picker").addEventListener("input", update_rgb_light, false);
+    })
+  </script>
+
+  <script type="text/javascript" src="js/google-chart-loarder.js"></script>
+  <script type="text/javascript">
+    google
+      .charts
+      .load('current', {
+        'packages': ['corechart']
+      });
+    //  google.charts.setOnLoadCallback(drawChart);
+
+    var light_history = [
+      ['time (s)', 'Light level (lux)']
+    ]
+
+    var chart = null
+    var chart_need_draw = false
+    var chart_ready = true
+
+    function drawChart() {
+      var data = google
+        .visualization
+        .arrayToDataTable(light_history);
+
+      var options = {
+        title: 'Light level history',
+        curveType: 'function',
+        hAxis: {
+          title: 'Time',
+          titleTextStyle: {
+            color: '#333'
+          }
+        },
+        vAxis: {
+          minValue: 0
+        }
+      };
+
+      chart_need_draw = false
+      chart_ready = false
+      //  var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+      if (!chart) {
+        chart = new google
+          .visualization
+          .LineChart(document.getElementById('chart_div'));
+        google
+          .visualization
+          .events
+          .addListener(chart, 'ready', on_light_lvl_chat_ready);
+      }
+
+      chart.draw(data, options);
+    }
+  </script>
+
+</head>
+
+<body onload="kuzzle_init()">
+  <div id="navbar"></div>
+
+  <div class="container">
+    <div class="row justify-content-around">
+      <div class="col-sm mt-5">
+        <div class="card" style="width: 15rem;">
+          <div class="card-header">
+            <i class="far fa-address-card fa-lg"></i>
+            Card Reader
+          </div>
+          <div class="card-body">
+            <div class="card-text" id='rfid_content'></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm  mt-5">
+        <div class="card" style="width: 15rem;">
+          <div class="card-header">
+            <i class="fab fa-nintendo-switch fa-lg"></i>
+            Buttons
+          </div>
+          <div class="card-body">
+            <div class="card-text" id='buttons_content'>
+              <div class="">
+                <div class="badge badge-secondary" id="button_0">Btn O</div>
+                <div class="badge badge-secondary" id="button_1">Btn 1</div>
+                <div class="badge badge-secondary" id="button_2">Btn 2</div>
+                <div class="badge badge-secondary" id="button_3">Btn 3</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm  mt-5">
+        <div class="card" style="width: 15rem;">
+          <div class="card-header">
+            <i class="fas fa-eye fa-lg"></i>
+            Motion sensor
+          </div>
+          <div class="card-body">
+            <div class="card-text">
+              <div class="badge badge-secondary" id='motion_content'>Motion</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm  mt-5">
+        <div class="card" style="width: 15rem;">
+          <div class="card-header">
+            <i class="fas fa-sun fa-lg"></i>
+            Light sensor
+          </div>
+          <div class="card-body">
+            <div class="card-text" id='light_level'>
+              Light level almost in Lux
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm mt-5">
+        <div class="card" style="width: 15rem;">
+          <div class="card-header">
+            <i class="fas fa-lightbulb fa-lg"></i>
+            RGB Light
+            <label class="switch" style="float: right">
+            <input type="checkbox" onchange="rgb_light_switch()" id="rgb_light_switch">
+            <span class="slider round"></span>
+          </label>
+          </div>
+          <div class="card-body">
+            <div class="card-text" id='rgb_light_content'>
+              <div class="row">
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_0"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_1"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_2"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_3"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_4"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_5"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_6"></div>
+                <div class="rounded-circle led border border-dark" style="background: #f00" id="led_7"></div>
+              </div>
+              <hr>
+              <div class="d-flex flex-column">
+                  <input type="color" class="btn-primary m-3" id="light-color-picker" value="#70c24a"/>
+                  <button type="button" class="btn btn-primary m-3" onclick="rgb_light_rainbow()">Rainbow</button>
+                  <button type="button" class="btn btn-primary m-3" onclick="rgb_light_cycle()"><i class="fas fa-redo"></i></button>
+                  <!-- <button type="button" class="btn btn-primary m-3" onclick="rgb_light_random()">Random</button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm mt-5">
+        <div class="card" style="width: 50rem;">
+          <div class="card-header">
+            <i class="fas fa-chart-line fa-lg"></i>
+            Light level history
+          </div>
+          <div class="card-body">
+            <div class="card-text" id='rgb_light_content'>
+              <div id="chart_div" style="width: 100%; height: 500px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card mt-5">
+        <div class="card-header">
+          <i class="fa fa-info-circle fa-lg"></i>
+          Device information
+        </div>
+        <div class="card-body text-center">
+          <div class="card-text">
+            ${device.uid}
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <script src="js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  <script src="js/bluebird.min.js"></script>
+  <script src="js/kuzzle.js"></script>
+  <script src="js/js-yaml.min.js"></script>
+  <style>
+    .led {
+      width: 25px;
+      height: 25px;
+    }
+
+    .alert {
+      margin-bottom: 3px;
+      height: 30px;
+      line-height: 30px;
+      padding: 0 15px;
+    }
+
+    .img-success {
+      content: url("./icons/glyphicons-199-ok-circle-white.png");
+    }
+
+    .img-danger {
+      content: url("./icons/glyphicons-198-remove-circle.png");
+    }
+
+    .img-small {
+      width: 15px;
+      height: 15px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 23px;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 15px;
+      width: 15px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(16px);
+      -ms-transform: translateX(16px);
+      transform: translateX(16px);
+    }
+
+    /* Rounded sliders */
+
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+  </style>
+  <script type="text/javascript">
+    MAX_HISTORY = 1000
+
+    function subscribe_to_rfid(device) {
+      console.log("Subscribing to RFID card events");
+      device_state_col
+        .subscribe({
+          equals: {
+            device_id: 'NFC_' + device.uid
+          }
+        }, {
+          subscribeToSelf: false
+        }, (err, res) => {
+          var state = res.document.content.state
+          if (state.in_field) {
+            console.log('Card detected in sensor field: ', state.card_id)
+            card_div = document.getElementById('rfid_content_' + state.card_id)
+            if (card_div) {
+              card_div.className = 'badge badge-primary'
+            } else {
+              document
+                .getElementById('rfid_content')
+                .innerHTML += `<div class="badge badge-primary" id="rfid_content_${state.card_id}">${state.card_id}</div></br>`
+            }
+          } else {
+            console.log('Card left sensor field: ', state.card_id)
+            card_div = document.getElementById('rfid_content_' + state.card_id)
+            card_div.className = "badge badge-secondary"
+          }
+        })
+        .onDone((a) => {
+          console.log("[DONE] Subscribing to RFID card events");
+        })
+
+    }
+
+    function subscribe_to_buttons(device) {
+      console.log("Subscribing to button events");
+      device_state_col
+        .subscribe({
+          equals: {
+            device_id: 'buttons_' + device.uid
+          }
+        }, {
+          subscribeToSelf: false
+        }, (err, res) => {
+          var state = res
+            .document
+            .content
+            .state
+          console
+            .log('button states: ', state)
+
+          button_0_div = document.getElementById('button_0')
+          if (state.button_0 === "PRESSED") {
+            button_0_div.className = "badge badge-primary"
+          } else {
+            button_0_div.className = "badge badge-secondary"
+          }
+
+          button_1_div = document.getElementById('button_1')
+          if (state.button_1 === "PRESSED") {
+            button_1_div.className = "badge badge-primary"
+          } else {
+            button_1_div.className = "badge badge-secondary"
+          }
+
+          button_2_div = document.getElementById('button_2')
+          if (state.button_2 === "PRESSED") {
+            button_2_div.className = "badge badge-primary"
+          } else {
+            button_2_div.className = "badge badge-secondary"
+          }
+
+          button_3_div = document.getElementById('button_3')
+          if (state.button_3 === "PRESSED") {
+            button_3_div.className = "badge badge-primary"
+          } else {
+            button_3_div.className = "badge badge-secondary"
+          }
+        })
+        .onDone((a) => {
+          console.log("[DONE] Subscribing to button events");
+        })
+    }
+
+    function subscribe_to_motion_sensor(device) {
+      console.log("Subscribing to motion sensor events");
+      device_state_col
+        .subscribe({
+          equals: {
+            device_id: 'motion_' + device.uid
+          }
+        }, {
+          subscribeToSelf: false
+        }, (err, res) => {
+          var state = res
+            .document
+            .content
+            .state
+          console
+            .log('motion sensor states: ', state)
+
+          if (state.motion)
+            document
+            .getElementById('motion_content')
+            .className = "badge badge-primary"
+          else
+            document
+            .getElementById('motion_content')
+            .className = "badge badge-secondary"
+        })
+        .onDone((a) => {
+          console.log("[DONE] Subscribing to motion sensor events");
+        })
+    }
+
+    function light_sensor_search_cb(err, res) {
+      res.getDocuments().forEach( doc => {
+        on_light_sensor_state(doc.content.state, doc.meta.createdAt, false, false)
+      })
+
+      if(light_history.length < MAX_HISTORY)
+        device_state_col.scroll(res.options.scrollId, {scroll: '1m'}, light_sensor_search_cb)
+      else {
+        subscribe_to_light_sensor(device)
+      }
+    }
+
+    function get_light_sensor_history(device) {
+      console.log("Getting current RGB light state");
+      device_state_col.search({
+          query: {
+            bool: {
+              must: [{
+                  term: {
+                    device_id: 'light_lvl_' + device.uid,
+                  }
+                }
+              ]
+            }
+          },
+          sort: [{
+            "_kuzzle_info.createdAt": "desc"
+          }]
+        }, {
+          scroll: "1m",
+          from: 0,
+          size: 500
+        },
+        light_sensor_search_cb
+      )
+    }
+
+    function on_light_sensor_state(state, date, update_display = false, push=true) {
+      if(push)
+        light_history.push([new Date(date), parseFloat(state.level)])
+      else
+        light_history.splice(1, 0, [new Date(date), parseFloat(state.level)])
+
+      if (light_history.length > MAX_HISTORY)
+        light_history.splice(1, 1)
+
+      if(update_display) {
+        document.getElementById('light_level')
+        .innerHTML = `<h2 class="font-weight-bold">${state.level.toFixed(2)} Lux</h2>`
+
+        chart_need_draw = true
+        if (chart_ready)
+        drawChart()
+      }
+    }
+
+    function subscribe_to_light_sensor(device) {
+      console.log("Subscribing to light level sensor events");
+      device_state_col.subscribe({
+            equals: {
+              device_id: 'light_lvl_' + device.uid
+            }
+          }, {
+            subscribeToSelf: false
+          },
+          (err, res) => {
+            on_light_sensor_state(res.document.content.state, res.document.meta.createdAt, true, true)
+          })
+        .onDone((a) => {
+          console.log("[DONE] Subscribing to light level sensor events");
+        })
+    }
+
+    function RGBToHex(r, g, b) {
+      var bin = r << 16 | g << 8 | b;
+      return (function(h) {
+        return new Array(7 - h.length).join("0") + h
+      })(bin.toString(16).toUpperCase())
+    }
+
+    function subscribe_to_rgb_light(device) {
+      console.log("Subscribing to RGB light state");
+      device_state_col
+        .subscribe({
+          and: [{
+              equals: {
+                device_id: 'rgb_light_' + device.uid
+              }
+            },
+            {
+              equals: {
+                partial_state: false
+              }
+            }
+          ]
+        }, {
+          subscribeToSelf: true
+        }, (err, res) => {
+          var state = res.document.content.state
+          update_rgb_light_display(state)
+        })
+        .onDone((a) => {
+          console.log("[DONE] Subscribing to RGB light state");
+        })
+    }
+
+    function rgb_light_get_state(device) {
+      console.log("Getting current RGB light state");
+      device_state_col.search({
+          query: {
+            bool: {
+              must: [{
+                  term: {
+                    device_id: 'rgb_light_' + device.uid,
+                  }
+                },
+                {
+                  term: {
+                    partial_state: false,
+                  }
+                }
+              ]
+            }
+          },
+          sort: [{
+            "_kuzzle_info.createdAt": "desc"
+          }]
+        }, {
+          size: 1
+        },
+        (err, res) => {
+          var state = res.getDocuments()[0].content.state
+          update_rgb_light_display(state)
+        })
+    }
+
+    function on_light_lvl_chat_ready() {
+      chart_ready = true;
+      if (chart_need_draw)
+        drawChart()
+    }
+
+    function rgb_light_switch() {
+      b = $('#rgb_light_switch')[0]
+      console.log(b.checked);
+
+      device_state = {
+        device_id: 'rgb_light_' + device.uid,
+        partial_state: true,
+        state: {
+          on: b.checked
+        }
+      }
+
+      console.log("Device state: ", device_state)
+
+      kuzzle.collection('device-state')
+        .createDocument(device_state, (err, res) => {
+          if (err)
+            console.log(err);
+        })
+    }
+
+    function update_rgb_light_display(state) {
+      console.log("RGB light: ", state);
+
+      if (state.on)
+        $('#rgb_light_switch')[0].checked = true
+      else
+        $('#rgb_light_switch')[0].checked = false
+
+      if (state.mode === "single-color") {
+        for (i = 0; i < 8; i++)
+          $("#led_" + i).css("background", state.color)
+      } else if (state.mode === "color-ramp") {
+        console.log($("#led_"))
+        state.ramp.forEach((c, i) => {
+          $("#led_" + i).css("background", "#" + RGBToHex(c[0], c[1], c[2]))
+        })
+      }
+    }
+
+    function update_rgb_light(e) {
+      rgb_light_publish_state({
+        mode: "single-color",
+        color: e.srcElement.value
+      })
+    }
+
+    function rgb_light_publish_state(state) {
+      device_state = {
+        device_id: 'rgb_light_' + device.uid,
+        partial_state: true,
+        state: state
+      }
+      console.log("RGB light partial state : ", device_state)
+
+      kuzzle.collection('device-state')
+        .createDocument(device_state, (err, res) => {
+          if (err)
+            console.log(err);
+          else
+            console.log("Document published");
+
+          console.log(res);
+        })
+    }
+
+    function rgb_light_rainbow() {
+      rgb_light_publish_state({
+        mode: "color-ramp",
+        ramp: [
+            [255, 0, 0],
+            [127, 127, 0],
+            [0, 255, 0],
+            [0, 127, 127],
+            [0, 0, 255],
+            [127, 0, 127],
+            [255, 127, 0],
+            [255, 255, 255],
+        ]
+      })
+    }
+
+    function rgb_light_cycle() {
+      rgb_light_publish_state({
+        mode: "cycle",
+        ramp: [
+            [255, 0, 0],
+            [127, 127, 0],
+            [0, 255, 0],
+            [0, 127, 127],
+            [0, 0, 255],
+            [127, 0, 127],
+            [255, 127, 0],
+            [255, 255, 255],
+        ]
+      })
+    }
+
+    function rgb_light_random() {
+
+    }
+
+    function kuzzle_init() {
+      console.log('kuzzle_init');
+
+      config = ${config}
+      device = ${device}
+
+      console.log('Device info:', device);
+      console.log('Configuration:', config);
+
+      kuzzlehost = config.kuzzle.host
+      kuzzleport = config
+        .kuzzle
+        .port
+      console
+        .log("Connecting to kuzzle: ", kuzzlehost, ":", kuzzleport);
+
+      kuzzle = new Kuzzle(kuzzlehost, {
+        port: kuzzleport,
+        autoReconnect: false
+      }, (err, res) => {
+        if (err) {
+          console.log('Kuzzle connection error:', err)
+        } else {
+          console.log("Connected to Kuzzle: ", kuzzlehost, ":", kuzzleport);
+          kuzzle.setDefaultIndex('iot');
+          device_state_col = kuzzle.collection("device-state")
+
+          t0 = Date.now() / 1000
+
+          get_light_sensor_history(device)
+          subscribe_to_rfid(device)
+          subscribe_to_buttons(device)
+          subscribe_to_motion_sensor(device)
+          subscribe_to_rgb_light(device)
+          rgb_light_get_state(device)
+        }
+      })
+    }
+  </script>
+
+</body>
+
+</html>

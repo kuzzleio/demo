@@ -1,0 +1,277 @@
+{
+    "kuzzle": {
+        "server": null,
+        "index" : "iot",
+        "collections" : {
+            "state" : "device-state",
+            "autoplay" : "autoplay"
+        }
+    },
+    "defaultBoardID": "00000000c9591b74",
+    "clips": {
+        "bike_alert": {
+            "file": "bike_alert.mp4",
+            "loop": false
+        },
+        "inside": {
+            "file": "home.mp4",
+            "loop": true
+        },
+        "outdoor_open_door": {
+            "file": "open_door.mp4",
+            "loop": false,
+            "play_next" : "inside"
+        },
+        "outdoor_waiting": {
+            "file": "waiting_outside.mp4",
+            "loop": true
+        },
+        "inside_close_shutter": {
+            "file": "close_shutter.mp4",
+            "loop": false
+        },
+        "inside_open_shutter": {
+            "file": "open_shutter.mp4",
+            "loop": false,
+            "play_next" : "inside"
+        },
+        "bank_demo": {
+            "file": "bank.mp4",
+            "loop": false
+        },
+        "paint": {
+            "file": "paint.mp4",
+            "loop": false
+        },
+        "chat": {
+            "file": "slam.mp4",
+            "loop": false
+        },
+        "outdoor_night_light_off": {
+            "file": "outdoor_night_light_off.mp4",
+            "loop": true
+        },
+        "outdoor_night_light_on": {
+            "file": "outdoor_night_light_on.mp4",
+            "loop": false
+        }
+    },
+    "events": {
+        "restart": [
+            {"message":"lightsensor_high"},
+            {"message":"neocycle"},
+            {"message":"button_0","next_in":500},
+            {"message":"button_none"}
+        ],
+        "card_ok": [
+            {"message":"card_ok","next_in":1000},
+            {"message":"card_out"}
+        ],
+        "card_ko": [
+            {"message":"card_ko","next_in":1000},
+            {"message":"card_out"}
+        ],
+        "light_low": [
+            {"message":"lightsensor_low"}
+        ],
+        "light_high": [
+            {"message":"lightsensor_high"}
+        ],
+        "go_outside": [
+            {"message":"button_1","next_in":50},
+            {"message":"motion_off","next_in":500},
+            {"message":"button_none"}
+        ],
+        "motion": [
+            {"message":"motion_on","next_in":5000},
+            {"message":"motion_off"}
+        ],
+        "bike_alert": [
+            {"message":"button_2","next_in":500},
+            {"message":"button_none"}
+        ],
+        "bank_demo": [
+            {"message":"button_3","next_in":500},
+            {"message":"button_none"}
+        ],
+        "autoplay" : [
+            {"message":"lightsensor_high"},
+            {"message":"button_0","next_in":500},
+            {"message":"button_none"},
+            {"message":"card_ko","next_in":1500},
+            {"message":"card_out"},
+            {"message":"card_ok","next_in":1500},
+            {"message":"card_out","next_in":4000},
+            {"message":"lightsensor_low","next_in":5000},
+            {"message":"lightsensor_high","next_in":5000},
+            {"message":"motion_off"},
+            {"message":"button_1","next_in":500},
+            {"message":"button_none","next_in":1500},
+            {"message":"motion_on","next_in":5000},
+            {"message":"motion_off","next_in":2000},
+            {"message":"button_2","next_in":500},
+            {"message":"button_none","next_in":19000}
+        ]
+    },
+    "messages" : {
+        "card_ok" : {
+            "device_id":"NFC_",
+            "device_type":"RFID_reader",
+            "state":{
+                "card_id": "9549B990",
+                "in_field": true
+            }
+        },
+        "card_ko" : {
+            "device_id":"NFC_",
+            "device_type":"RFID_reader",
+            "state":{
+                "card_id": "45EDB390",
+                "in_field": true
+            }
+        },
+        "card_out" : {
+            "device_id":"NFC_",
+            "device_type":"RFID_reader",
+            "state":{
+                "card_id": null,
+                "in_field": false
+            }
+        },
+        "lightsensor_low" : {
+            "device_id":"light_lvl_",
+            "device_type":"light_sensor",
+            "state":{
+                "level":"25"
+            }
+        },
+        "lightsensor_high" : {
+            "device_id":"light_lvl_",
+            "device_type":"light_sensor",
+            "state":{
+                "level":"150"
+            }
+        },
+        "motion_on" : {
+            "device_id":"motion_",
+            "device_type":"motion-sensor",
+            "state":{
+                "motion":true
+            }
+        },
+        "motion_off" : {
+            "device_id":"motion_",
+            "device_type":"motion-sensor",
+            "state":{
+                "motion":false
+            }
+        },
+        "button_none" : {  
+            "device_id":"buttons_",
+            "device_type":"button",
+            "state":{
+                "button_0": "RELEASED",
+                "button_1": "RELEASED",
+                "button_2": "RELEASED",
+                "button_3": "RELEASED"
+            }
+        },
+        "button_0" : {  
+            "device_id":"buttons_",
+            "device_type":"button",
+            "state":{
+                "button_0": "PRESSED",
+                "button_1": "RELEASED",
+                "button_2": "RELEASED",
+                "button_3": "RELEASED"
+            }
+        },
+        "button_1" : {  
+            "device_id":"buttons_",
+            "device_type":"button",
+            "state":{
+                "button_0": "RELEASED",
+                "button_1": "PRESSED",
+                "button_2": "RELEASED",
+                "button_3": "RELEASED"
+            }
+        },
+        "button_2" : {  
+            "device_id":"buttons_",
+            "device_type":"button",
+            "state":{
+                "button_0": "RELEASED",
+                "button_1": "RELEASED",
+                "button_2": "PRESSED",
+                "button_3": "RELEASED"
+            }
+        },
+        "button_3" : {  
+            "device_id":"buttons_",
+            "device_type":"button",
+            "state":{
+                "button_0": "RELEASED",
+                "button_1": "RELEASED",
+                "button_2": "RELEASED",
+                "button_3": "PRESSED"
+            }
+        },
+        "neocycle": {
+            "device_id": "rgb_light_",
+            "partial_state": true,
+            "state" : {
+                "on": true,
+                "mode": "cycle",
+                "ramp": [
+                    [255, 0, 0],
+                    [127, 127, 0],
+                    [0, 255, 0],
+                    [0, 127, 127],
+                    [0, 0, 255],
+                    [127, 0, 127],
+                    [255, 127, 0],
+                    [255, 255, 255]
+                ]
+            },
+            "device_type": "neopixel-linear"
+        }
+
+    },
+    "sensors" : {
+        "light" : {
+            "threshold" : 80
+        },
+        "buttons": {
+            "button_0" : "outdoor_waiting",
+            "button_1" : "outdoor_night_light_off",
+            "button_2" : "bike_alert",
+            "button_3" : "bank_demo"
+        },
+        "nfc": {
+            "cards": {
+                "9549B990": {
+                    "previousScene" : "outdoor_waiting",
+                    "scene": "outdoor_open_door",
+                    "color": "#00FF00",
+                    "valid": true
+                },
+                "45EDB390": {
+                    "previousScene" : "outdoor_waiting",
+                    "color": "#FF0000"
+                }
+            }
+        }
+    },
+    "colorRamp": {
+        "defaultColors" : [
+            [255, 0, 0],
+            [127, 127, 0],
+            [0, 255, 0],
+            [0, 127, 127],
+            [0, 0, 255],
+            [127, 0, 127],
+            [255, 127, 0],
+            [255, 255, 255]
+        ]
+    }
+}
